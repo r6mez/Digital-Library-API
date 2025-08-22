@@ -1,0 +1,32 @@
+{
+  "name": "digital-library-api",
+  "version": "1.0.0",
+  "description": "A feature-rich backend API for an online library, built with Node.js, Express, and MongoDB. Powers user authentication, book purchasing, borrowing via subscriptions, and a complete admin management system.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/r6mez/Digital-Library-API.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/r6mez/Digital-Library-API/issues"
+  },
+  "homepage": "https://github.com/r6mez/Digital-Library-API#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "joi": "^18.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.17.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
