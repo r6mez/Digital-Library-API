@@ -1,6 +1,60 @@
 # Digital Library API 📚🛜
 A feature-rich backend API for an online library, built with Node.js, Express, and MongoDB. Powers user authentication, book purchasing, borrowing via subscriptions, and a complete admin management system.
 
+## Tasks
+- [X] Setup github and the project
+- [ ] Create models for all entites
+- [X] User entity 
+- [ ] Book entity
+- [ ] subscription entity
+- [ ] Offers 
+
+
+## 🛫 Setup
+### ✅ Prerequisites
+- Node.js (v18.x or later)
+- npm 
+- MongoDB (local instance or MongoDB Atlas)
+
+### 🔑 Environment Variables
+
+To run this project, you will need to add the following environment variables to a .env file in the root directory.
+
+Create a .env file and add the following:
+
+```env
+# MongoDB Connection String
+MONGO_URI=mongodb://127.0.0.1:27017/my-auth-app
+
+# JWT Secret Key
+JWT_SECRET=thisisareallystrongandsecretkey
+
+# Port Number
+PORT=5000
+```
+
+### 🪖 Installation & Setup
+
+Clone the repository:
+```bash
+git clone https://github.com/r6mez/Digital-Library-API.git
+cd Digital-Library-API
+```
+
+Install dependencies:
+``` bash
+ npm install
+```
+
+Running the Application
+To start the server in development mode (with auto-restart), run:
+
+```bash
+npm start
+```
+
+The server will be running on http://localhost:5000.
+
 ## 🛠️ Tech Stack
 - **Backend:** Node.js, Express.js
 - **Database:** MongoDB with Mongoose
@@ -100,13 +154,3 @@ Offers
 - **Authorization**: Implement **Role-Based Access Control (RBAC)**. A middleware should check for the `isAdmin` flag on user profiles to protect all `/*` routes.
 - **Input Validation**: All incoming data from request bodies must be validated to ensure it's in the correct format and prevent security vulnerabilities. Use a library like `Joi` or `express-validator`.
 - **Error Handling**: Create a centralized error handling mechanism. Use standard HTTP status codes (`400`, `401`, `403`, `404`, `500`) and return meaningful JSON error messages.
-
-
-
-## Tasks
-- [ ] Setup github and the project
-- [ ] Create models for all entites
-- [ ] User entity 
-- [ ] Book entity
-- [ ] subscription entity
-- [ ] Offers 
