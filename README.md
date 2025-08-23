@@ -68,17 +68,17 @@ The server will be running on http://localhost:5000.
 **Category**
 `(id, name)`
 
-**BookFormat** 
+**BookType** 
 `(id, name)`
 
 **Book**
-`(id, name, author, description, cover_image_url, publication_date, category_id, format_id, buy_price, borrow_price_per_day, pdf_path, createdAt, updatedAt)`
+`(id, name, author, description, cover_image_url, publication_date, category_id, book_type_id, buy_price, borrow_price_per_day, pdf_path, createdAt, updatedAt)`
 
-**Owned**
+**Owend Book**
 `(id, user_id, book_id, createdAt)`
 
-**Borrowed**
-`(id, user_id, book_id, borrow_date, deadline, createdAt)`
+**Borrowed Book**
+`(id, user_id, book_id, borrow_date, return_date, createdAt)`
 
 **Subscription**
 `(id, name, maximum_borrow, price, duration_in_days)`
