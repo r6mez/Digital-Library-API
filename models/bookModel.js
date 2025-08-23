@@ -20,15 +20,15 @@ const bookSchema = new mongoose.Schema({
     publication_date: {
         type: Date,
     },
-    catogry: {
+    category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
         required: true
     },
-    book_type :{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'BookType',
-        required:true
+    type: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'type',
+        required: true
     },
     buy_price: {
         type: Number,

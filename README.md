@@ -22,7 +22,7 @@ MONGO_URI=mongodb://127.0.0.1:27017/my-auth-app
 JWT_SECRET=thisisareallystrongandsecretkey
 
 # Port Number
-PORT=5000
+PORT=5001
 ```
 
 ### 🪖 Installation & Setup
@@ -45,7 +45,7 @@ To start the server in development mode (with auto-restart), run:
 npm start
 ```
 
-The server will be running on http://localhost:5000.
+The server will be running on http://localhost:5001.
 
 ## 🛠️ Tech Stack
 - **Backend:** Node.js, Express.js

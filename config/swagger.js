@@ -18,6 +18,13 @@ const options = {
         }
       }
     },
+    tags: [
+      { name: 'Auth', description: 'Authentication routes' },
+      { name: 'Users', description: 'User management and profile' },
+      { name: 'Types', description: 'Book types management' },
+      { name: 'Categories', description: 'Book categories management' },
+      { name: 'Books', description: 'Book endpoints' }
+    ],
     servers: [
       {
         url: "http://localhost:5001", 
