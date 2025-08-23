@@ -1,4 +1,4 @@
-# Digital Library API 📚🛜
+# Digital Library API 📚
 A feature-rich backend API for an online library, built with Node.js, Express, and MongoDB. Powers user authentication, book purchasing, borrowing via subscriptions, and a complete admin management system.
 
 
