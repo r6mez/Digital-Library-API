@@ -18,9 +18,9 @@
  *         publication_date:
  *           type: string
  *           format: date-time
- *         catogry_id:
+ *         category:
  *           type: string
- *         type_id:
+ *         type:
  *           type: string
  *         buy_price:
  *           type: number
@@ -49,11 +49,11 @@
  *         schema:
  *           type: string
  *       - in: query
- *         name: type_id
+ *         name: type
  *         schema:
  *           type: string
  *       - in: query
- *         name: category_id
+ *         name: category
  *         schema:
  *           type: string
  *     responses:
@@ -89,13 +89,13 @@ const getBooks = asyncHandler(async (req, res, next) => {
         const filter = {};
 
         if (name) filter.name = { $regex: name, $options: 'i' }; //  $regex tell mongo to get the word in any order e.g for Zeyad( Zeyad Zahran , Zahran Zeyad) both are the same  and i means the filter will be Case Insensitive
-        if (type) filter.book_type = type;
+        if (type) filter.type = type;
         if (category) filter.category = category;
 
         // Find books with filters and pagination
         const books = await Book.find(filter)
-            .populate('category_id', 'name')
-            .populate('type_id', 'name')
+            .populate('category', 'name')
+            .populate('type', 'name')
             .skip((page - 1) * limit) // here we skip the res form prev pages 
             .limit(Number(limit));
 
@@ -134,7 +134,7 @@ const getBookById = asyncHandler(async (req, res, next) => {
     try {
         const book = await Book.findById(req.params.id)
             .populate('category', 'name')
-            .populate('book_type', 'name');
+            .populate('type', 'name');
 
         if (!book) return res.status(404).json({ message: 'Book not found' });
         res.json(book);

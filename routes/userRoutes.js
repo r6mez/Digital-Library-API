@@ -3,7 +3,9 @@ const router = express.Router();
 const { protect } = require('../middleware/authMiddleware');
 const { getSignedUser } = require('../controllers/userController');
 
-// This route is protected. You must have a valid token to access it.
-router.get('/profile', protect, getSignedUser);
+// Protected routes for the signed-in user
+router.get('/me', protect, getSignedUser);
+router.get('/me/subscription', protect, require('../controllers/userController').getUserSubscription);
+router.get('/me/transactions', protect, require('../controllers/userController').getUserTransactions);
 
 module.exports = router;

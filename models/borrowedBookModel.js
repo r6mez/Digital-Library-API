@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 
 const borrowedBookSchema = new mongoose.Schema({
-    user_id: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true
     },
-    book_id: {
+    book: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Book",
         required: true

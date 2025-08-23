@@ -6,8 +6,8 @@ const createBookSchema = Joi.object({
     description: Joi.string().allow(''),
     cover_image_url: Joi.string().allow(''),
     publication_date: Joi.date().allow(null),
-    category_id: Joi.string().required(),
-    type_id: Joi.string().required(),
+    category: Joi.string().required(),
+    type: Joi.string().required(),
     buy_price: Joi.number().required(),
     borrow_price_per_day: Joi.number().required(),
     pdf_path: Joi.string().allow('')

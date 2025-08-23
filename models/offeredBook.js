@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 
 const offeredBookSchema = new mongoose.Schema({
-    offer_id: {
+    offer: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Offer',
         required: true
     },
-    book_id: {
+    book: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Book',
         required: true
