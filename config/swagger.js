@@ -20,11 +20,11 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:5000", // Match server.js default PORT
+        url: "http://localhost:5001", 
       },
     ],
   },
-  apis: ["./routes/*.js", "./controllers/*.js"], // Paths to files with annotations
+  apis: ["./routes/*.js", "./controllers/*.js"],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
