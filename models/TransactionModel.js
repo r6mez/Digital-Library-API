@@ -6,7 +6,7 @@ const transactionSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    amount: { // 
+    amount: { 
         type: Number,
         required: true
     },
