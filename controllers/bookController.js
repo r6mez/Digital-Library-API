@@ -18,9 +18,9 @@
  *         publication_date:
  *           type: string
  *           format: date-time
- *         catogry:
+ *         catogry_id:
  *           type: string
- *         book_type:
+ *         type_id:
  *           type: string
  *         buy_price:
  *           type: number
@@ -49,11 +49,11 @@
  *         schema:
  *           type: string
  *       - in: query
- *         name: type
+ *         name: type_id
  *         schema:
  *           type: string
  *       - in: query
- *         name: category
+ *         name: category_id
  *         schema:
  *           type: string
  *     responses:
@@ -94,8 +94,8 @@ const getBooks = asyncHandler(async (req, res, next) => {
 
         // Find books with filters and pagination
         const books = await Book.find(filter)
-            .populate('category', 'name')
-            .populate('book_type', 'name')
+            .populate('category_id', 'name')
+            .populate('type_id', 'name')
             .skip((page - 1) * limit) // here we skip the res form prev pages 
             .limit(Number(limit));
 

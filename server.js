@@ -4,6 +4,8 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const bookRoutes = require('./routes/bookRoutes');
+const typeRoutes = require('./routes/typeRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
 const { swaggerUi, swaggerSpec } = require("./config/swagger");
 
 // Load environment variables
@@ -24,6 +26,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/books', bookRoutes);
+app.use('/types', typeRoutes);
+app.use('/categories', categoryRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running...');

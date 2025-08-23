@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
 
-const bookTypeSchema = new mongoose.Schema({
+const typeSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
         unique: true,
+        trim: true,
     }
 }, { timestamps: true });
 
-module.exports = mongoose.model('BookType', bookTypeSchema);
+module.exports = mongoose.model('Type', typeSchema);
