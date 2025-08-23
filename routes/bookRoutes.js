@@ -3,7 +3,8 @@ const router = express.Router();
 const { getBooks, getBookById, createBook, updateBook, deleteBook } = require('../controllers/bookController');
 const { protect } = require('../middleware/authMiddleware');
 const { createBookSchema } = require('../validators/bookValidator');
-const validate = require('../middlewares/validate');
+const validate = require('../validators/validate');
+
 const { admin } = require('../middleware/adminMiddleware');
 
 router.get('/', getBooks);
