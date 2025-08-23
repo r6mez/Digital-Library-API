@@ -1,14 +1,6 @@
 # Digital Library API 📚🛜
 A feature-rich backend API for an online library, built with Node.js, Express, and MongoDB. Powers user authentication, book purchasing, borrowing via subscriptions, and a complete admin management system.
 
-## Tasks
-- [X] Setup github and the project
-- [ ] Create models for all entites
-- [X] User entity 
-- [ ] Book entity
-- [ ] subscription entity
-- [ ] Offers 
-
 
 ## 🛫 Setup
 ### ✅ Prerequisites
@@ -84,7 +76,7 @@ The server will be running on http://localhost:5000.
 `(id, name, maximum_borrow, price, duration_in_days)`
 
 **ActiveSubscription** 
-`(id, subscription_id, user_id, remaining_borrows, start_date, deadline, createdAt, updatedAt)`
+`(id, subscription_id, user_id, start_date, deadline, createdAt, updatedAt)`
 
 **Offer** 
 `(id, name, price, createdAt, updatedAt)`
@@ -94,7 +86,7 @@ The server will be running on http://localhost:5000.
 
 **Transaction** 
 `(id, user_id, amount, type, description, createdAt)`
-* `type` can be `'PURCHASE'`, `'SUBSCRIPTION'`, `'REFUND'`, etc.
+* `type` can be `'PURCHASE'`, `'SUBSCRIPTION'`, `'BRROW'`, etc.
 
 
 
@@ -102,13 +94,9 @@ The server will be running on http://localhost:5000.
 
 User
 - **POST** `/login` 
-	- email
-	- password
+	- email, password
 - **POST** `/register`
-	- name
-	- email
-	- password
-	- repeated password
+	- name, email, password
 - **GET** `/users/me` -> returns logged-in user data
 - **GET** `/users/me/subscription` -> return your active subscription plan
 - **GET** `/users/me/transactions` -> return your transaction history
@@ -124,10 +112,8 @@ Books
 - **DELETE** `/books/{id}` -> deletes a book
 - **GET** `/books/{id}/pdf` -> return book file, path
 - **POST** `/books/{id}/buy` 
-	- user_id
 	- user sends a request to buy a book, server check if the user has money >= book buy_price, if not sends error, else بيزبط الدنيا
 - **POST** `/books/{id}/borrow`
-	- user_id
 	- duration_in_days 
 	- check if user is subscribed, then check number of remaining books to borrow
 
@@ -139,7 +125,6 @@ Subscription
 	- maximum_borrow, price, duration_in_day
 - **DELETE** `/subscription/{id}` -> deletes
 - **POST** `/subscriptions/{id}/activate`
-	- user_id
 
 Offers
 - **POST** `/offer` 
