@@ -1,3 +1,80 @@
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Book:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         name:
+ *           type: string
+ *         author:
+ *           type: string
+ *         description:
+ *           type: string
+ *         cover_img_url:
+ *           type: string
+ *         publication_date:
+ *           type: string
+ *           format: date-time
+ *         catogry:
+ *           type: string
+ *         book_type:
+ *           type: string
+ *         buy_price:
+ *           type: number
+ *         borrow_price_per_day:
+ *           type: number
+ *         pdf_path:
+ *           type: string
+ *
+ * /books:
+ *   get:
+ *     summary: Get all books with pagination and optional filters
+ *     tags: [Books]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *       - in: query
+ *         name: name
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Paged list of books
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 page:
+ *                   type: integer
+ *                 total:
+ *                   type: integer
+ *                 books:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Book'
+ *       500:
+ *         description: Server error
+ */
 const Book = require('../models/bookModel');
 const asyncHandler = require('../utils/asyncHandler');
 
@@ -31,9 +108,28 @@ const getBooks = asyncHandler(async (req, res, next) => {
     }
 });
 
-// @desc Get book by ID
-// @route GET /books/:id
-// @access Public
+/**
+ * @swagger
+ * /books/{id}:
+ *   get:
+ *     summary: Get a book by its ID
+ *     tags: [Books]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Book object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Book'
+ *       404:
+ *         description: Book not found
+ */
 const getBookById = asyncHandler(async (req, res, next) => {
     try {
         const book = await Book.findById(req.params.id)
@@ -47,9 +143,32 @@ const getBookById = asyncHandler(async (req, res, next) => {
     }
 });
 
-// @desc Create new book
-// @route POST /books
-// @access Admin only
+/**
+ * @swagger
+ * /books:
+ *   post:
+ *     summary: Create a new book (admin only)
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Book'
+ *     responses:
+ *       201:
+ *         description: Book created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Book'
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
 const createBook = asyncHandler(async (req, res, next) => {
     try {
         const book = await Book.create(req.body);
@@ -59,9 +178,38 @@ const createBook = asyncHandler(async (req, res, next) => {
     }
 });
 
-// @desc Update book
-// @route PUT /books/:id
-// @access Admin only
+/**
+ * @swagger
+ * /books/{id}:
+ *   put:
+ *     summary: Update a book (admin only)
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Book'
+ *     responses:
+ *       200:
+ *         description: Updated book
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Book'
+ *       404:
+ *         description: Book not found
+ *       401:
+ *         description: Unauthorized
+ */
 const updateBook = asyncHandler(async (req, res, next) => {
     try {
         const updatedBook = await Book.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -72,9 +220,35 @@ const updateBook = asyncHandler(async (req, res, next) => {
     }
 });
 
-// @desc Delete book
-// @route DELETE /books/:id
-// @access Admin only
+/**
+ * @swagger
+ * /books/{id}:
+ *   delete:
+ *     summary: Delete a book (admin only)
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Book deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Book not found
+ *       401:
+ *         description: Unauthorized
+ */
 const deleteBook = asyncHandler(async (req, res, next) => {
     try {
         const book = await Book.findByIdAndDelete(req.params.id);
