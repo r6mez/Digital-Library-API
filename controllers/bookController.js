@@ -259,6 +259,41 @@ const deleteBook = asyncHandler(async (req, res, next) => {
     }
 });
 
+
+// borrow book
+// @route POST /books/:id/borrow
+// @access User only
+const borrowBook = asyncHandler(async (req, res, next) => {
+    try {
+        const book = await Book.findById(req.params.id);
+        if (!book) return res.status(404).json({ message: 'Book not found' });
+        // Check if the user has an active subscription
+        const activeSubscription = await ActiveSubscription.findOne({ user: req.body.id });
+        if (activeSubscription) {
+            const subscription = await Subscription.findById(activeSubscription.subscription_id);
+            const userTransactionsCount = await Transaction.countDocuments({ user: req.body.id, type: 'BORROW' });
+            if (userTransactionsCount >= subscription.maximum_borrow) {
+                // money user is willing to pay
+                const amountToPay = subscription.price * (userTransactionsCount - subscription.maximum_borrow + 1);
+                return res.status(400).json({ message: 'Borrow limit reached for your subscription', amountToPay });
+            }
+        }
+
+        // Create a new transaction
+        const transaction = await Transaction.create({
+            user: req.body.id,
+            book: book.id,
+            type: 'BORROW',
+            amount: req.body.amount,
+            description: req.body.description
+        });
+
+        res.status(201).json(transaction);
+    } catch (err) {
+        next(err);
+    }
+});
+
 /**
  * @swagger
  * /books/{id}/buy:
@@ -340,4 +375,4 @@ const buyBook = asyncHandler(async (req, res, next) => {
     res.json({ message: 'Book purchased successfully', owned });
 });
 
-module.exports = { getBooks, getBookById, createBook, updateBook, deleteBook, buyBook };
+module.exports = { getBooks, getBookById, createBook, updateBook, deleteBook, borrowBook, buyBook };
