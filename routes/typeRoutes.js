@@ -5,22 +5,6 @@ const router = express.Router();
  * tags:
  *   name: Types
  *   description: Book types management
- *
- * components:
- *   schemas:
- *     Type:
- *       type: object
- *       required:
- *         - name
- *       properties:
- *         id:
- *           type: string
- *           description: Auto-generated ID
- *         name:
- *           type: string
- *       example:
- *         id: "64d0c1f5e6f4a5a1c2b3d4e5"
- *         name: "Paperback"
  */
 const validate = require('../validators/validate');
 const { nameSchema } = require('../validators/typeCategoryValidator');

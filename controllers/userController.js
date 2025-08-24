@@ -69,11 +69,37 @@
  *       401:
  *         description: Unauthorized
  * 
+ * /users/me/offers:
+ *   get:
+ *     summary: Get offers assigned to the signed-in user
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Array of offers with included books
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   offer:
+ *                     type: object
+ *                   books:
+ *                     type: array
+ *                     items:
+ *                       $ref: '#/components/schemas/Book'
+ *       401:
+ *         description: Unauthorized
  */
 const User = require('../models/userModel');
 const asyncHandler = require('../utils/asyncHandler');
 const ActiveSubscription = require('../models/activeSubscribtionModel');
 const OwnedBooks = require('../models/owendBookModel');
+const Offer = require('../models/offerModel');
+const OfferedBook = require('../models/offeredBook');
 
 const getSignedUser = asyncHandler(async (req, res) => {
   res.status(200).json(req.user);
@@ -100,5 +126,17 @@ const getOwnedBooks = asyncHandler(async (req, res) => {
   res.status(200).json(books);
 });
 
+// Returns all offers created/assigned to the signed-in user (with included books)
+const getUserOffers = asyncHandler(async (req, res) => {
+  const offers = await Offer.find({ user: req.user._id }).sort({ createdAt: -1 }).lean();
 
-module.exports = { getSignedUser, getUserSubscription, getUserTransactions, getOwnedBooks };
+  const results = await Promise.all(offers.map(async (offer) => {
+    const offeredBooks = await OfferedBook.find({ offer: offer._id }).populate('book');
+    return { offer, books: offeredBooks.map(ob => ob.book) };
+  }));
+
+  res.status(200).json(results);
+});
+
+
+module.exports = { getSignedUser, getUserSubscription, getUserTransactions, getOwnedBooks, getUserOffers };
