@@ -23,6 +23,9 @@
  *         updatedAt:
  *           type: string
  *           format: date-time
+ *         expiresAt:
+ *           type: string
+ *           format: date-time
  *       required:
  *         - user
  *         - discounted_price
@@ -44,6 +47,12 @@ const offerSchema = new mongoose.Schema({
     original_price: {
         type: Number,
         require: true
+    }
+    ,
+    expiresAt: {
+        type: Date,
+        required: true,
+        default: function() { return new Date(Date.now() + 24 * 60 * 60 * 1000); } // 1 day from creation
     }
 }, { timestamps: true });
 

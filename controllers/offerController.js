@@ -33,7 +33,8 @@ const createOffer = asyncHandler(async (req, res) => {
     const offer = await Offer.create({
         user: user._id,
         original_price: total_price,
-        discounted_price: new_price
+        discounted_price: new_price,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
     })
 
     const offeredBooksObj = books.map(book => ({
@@ -51,6 +52,9 @@ const getOfferById = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const offer = await Offer.findById(id).lean();
     if (!offer) return res.status(404).json({ message: 'Offer not found' });
+    if (offer.expiresAt && new Date() > new Date(offer.expiresAt)) {
+        return res.status(410).json({ message: 'Offer has expired' });
+    }
 
     const offeredBooks = await OfferedBook.find({ offer: id }).populate('book');
 
@@ -75,6 +79,9 @@ const acceptOffer = asyncHandler(async (req, res) => {
 
     const offer = await Offer.findById(offerId);
     if (!offer) return res.status(404).json({ message: 'Offer not found' });
+    if (offer.expiresAt && new Date() > new Date(offer.expiresAt)) {
+        return res.status(410).json({ message: 'Offer has expired' });
+    }
 
     const offeredBooks = await OfferedBook.find({ offer: offerId }).populate('book');
 
@@ -111,4 +118,59 @@ const acceptOffer = asyncHandler(async (req, res) => {
     res.status(200).json({ message: 'Offer purchased successfully', owned, transaction });
 });
 
-module.exports = { createOffer, getOfferById, acceptOffer };
+// PUT /offer/:id -> admin only: update offer fields and optionally books
+const updateOffer = asyncHandler(async (req, res) => {
+    const offerId = req.params.id;
+    const { discounted_price, original_price, books } = req.body;
+
+    const offer = await Offer.findById(offerId);
+    if (!offer) return res.status(404).json({ message: 'Offer not found' });
+    if (offer.expiresAt && new Date() > new Date(offer.expiresAt)) {
+        return res.status(410).json({ message: 'Offer has expired' });
+    }
+
+    if (discounted_price !== undefined) offer.discounted_price = discounted_price;
+    if (original_price !== undefined) offer.original_price = original_price;
+
+    // If admin supplied a new books list, validate and replace offered books, and recalc prices
+    if (books && Array.isArray(books)) {
+        const foundBooks = await Promise.all(
+            books.map(async (book_id) => {
+                const book = await Book.findById(book_id).lean();
+                if (!book) throw new Error(`Book not found: ${book_id}`);
+                return book;
+            })
+        );
+
+        let total_price = 0;
+        foundBooks.forEach(b => { total_price += b.buy_price; });
+
+        offer.original_price = total_price;
+        // If admin didn't explicitly set discounted_price, keep 25% off as default
+        if (discounted_price === undefined) offer.discounted_price = total_price * 0.75;
+
+        // Replace offered books
+        await OfferedBook.deleteMany({ offer: offer._id });
+        const offeredBooksObj = foundBooks.map(book => ({ offer: offer._id, book: book._id }));
+        await OfferedBook.insertMany(offeredBooksObj);
+    }
+
+    await offer.save();
+
+    res.status(200).json({ message: 'Offer updated', offer });
+});
+
+// DELETE /offer/:id -> admin only: remove offer and its offeredBook records
+const deleteOffer = asyncHandler(async (req, res) => {
+    const offerId = req.params.id;
+    const offer = await Offer.findById(offerId);
+    if (!offer) return res.status(404).json({ message: 'Offer not found' });
+
+    // Remove referenced offered book records, then the offer
+    await OfferedBook.deleteMany({ offer: offer._id });
+    await Offer.deleteOne({ _id: offer._id });
+
+    res.status(200).json({ message: 'Offer deleted' });
+});
+
+module.exports = { createOffer, getOfferById, acceptOffer, updateOffer, deleteOffer };

@@ -44,7 +44,7 @@ const bookSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    cover_img_url: {
+    cover_image_url: {
         type: String,
     },
     publication_date: {
@@ -57,7 +57,7 @@ const bookSchema = new mongoose.Schema({
     },
     type: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'type',
+        ref: 'Type',
         required: true
     },
     buy_price: {

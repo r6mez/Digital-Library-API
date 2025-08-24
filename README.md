@@ -79,7 +79,7 @@ The server will be running on http://localhost:5001.
 `(id, subscription, user, start_date, deadline, createdAt, updatedAt)`
 
 **Offer** 
-`(id, user, price, createdAt, updatedAt)`
+`(id, user, original_price, discounted_price, expiresAt, createdAt, updatedAt)`
 
 **OfferedBook**
 `(id, offer, book)`
@@ -129,9 +129,15 @@ Subscription
 Offers
 - **POST** `/offer` 
 	- array of books ids
-	- -> response offer
+	- array of books ids
+	- -> response offer (include an `expiresAt` timestamp and expire after 24 hours)
 - **GET** `/offer/{id}` -> gets the offer, the price, the books included
 - **POST** `/offer/{id}/accept` -> buy all of the books in the offer with the discounted price
+
+Notes about expiry
+- Offers have an `expiresAt` field and by default expire 24 hours after creation.
+- Operations on expired offers (read, accept, update) will return HTTP 410 Gone with a message indicating the offer has expired.
+- Admins can still manage offers via admin endpoints, but expired offers are treated as gone by the standard offer endpoints (see API docs / Swagger for admin routes).
 
 
 ## 📝 Notes
