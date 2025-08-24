@@ -6,6 +6,7 @@ const userRoutes = require('./routes/userRoutes');
 const bookRoutes = require('./routes/bookRoutes');
 const typeRoutes = require('./routes/typeRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
+const offerRoutes = require('./routes/offerRoutes');
 const { swaggerUi, swaggerSpec } = require("./config/swagger");
 
 // Load environment variables
@@ -28,6 +29,7 @@ app.use('/users', userRoutes);
 app.use('/books', bookRoutes);
 app.use('/types', typeRoutes);
 app.use('/categories', categoryRoutes);
+app.use('/offers', offerRoutes)
 
 app.get('/', (req, res) => {
   res.send('API is running...');

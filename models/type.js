@@ -1,3 +1,15 @@
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Type:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         name:
+ *           type: string
+ */
 const mongoose = require('mongoose');
 
 const typeSchema = new mongoose.Schema({
