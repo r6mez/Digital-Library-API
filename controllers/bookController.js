@@ -230,6 +230,125 @@ const deleteBook = asyncHandler(async (req, res, next) => {
 
 /**
  * @swagger
+ * /books/{id}/borrow:
+ *   post:
+ *     summary: Borrow a book
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user:
+ *                 type: string
+ *               amount:
+ *                 type: number
+ *               description:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Book borrowed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 transaction:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     user:
+ *                       type: string
+ *                     book:
+ *                       type: string
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *       400:
+ *         description: Bad request (insufficient funds or already borrowed)
+ *       401:
+ *         description: Unauthorized (missing or invalid token)
+ *       404:
+ *         description: Book not found
+ *       500:
+ *         description: Server error
+ */
+const borrowBook = asyncHandler(async (req, res, next) => {
+    try {
+        const book = await Book.findById(req.params.id);
+        if (!book) return res.status(404).json({ message: 'Book not found' });
+
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        // Check if the user has an active subscription
+        const activeSubscription = await ActiveSubscription.findOne({ user: user._id });
+        let amountToPay = 0;
+
+        if (activeSubscription) {
+            const subscription = await Subscription.findById(activeSubscription.subscription_id);
+
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+
+            const userTransactionsCount = await Transaction.countDocuments({
+                user: user._id,
+                type: 'BORROW',
+                createdAt: { $gte: startOfMonth, $lte: endOfMonth }
+            });
+
+            if (userTransactionsCount >= subscription.maximum_borrow) {
+                // user will pay with their money
+                amountToPay = book.borrow_price_per_day;
+                if (user.money < amountToPay) {
+                    return res.status(400).json({ message: 'Insufficient funds' });
+                } else {
+                    user.money -= amountToPay;
+                    await user.save();
+                }
+            }
+        } else {
+            // No subscription → user pays directly
+            amountToPay = book.borrow_price_per_day;
+            if (user.money < amountToPay) {
+                return res.status(400).json({ message: 'Insufficient funds' });
+            } else {
+                user.money -= amountToPay;
+                await user.save();
+            }
+        }
+
+        // Create a new transaction
+        const transaction = await Transaction.create({
+            user: user._id,
+            book: book.id,
+            type: 'BORROW',
+            amount: amountToPay,
+            description: `Borrowing book ${book.id}`
+        });
+
+        res.status(201).json({ message: 'Book borrowed successfully', transaction });
+    } catch (err) {
+        next(err);
+    }
+});
+
+/**
+ * @swagger
  * /books/{id}/buy:
  *   post:
  *     summary: Buy a book
@@ -309,4 +428,4 @@ const buyBook = asyncHandler(async (req, res, next) => {
     res.json({ message: 'Book purchased successfully', owned });
 });
 
-module.exports = { getBooks, getBookById, createBook, updateBook, deleteBook, buyBook };
+module.exports = { getBooks, getBookById, createBook, updateBook, deleteBook, borrowBook, buyBook };
