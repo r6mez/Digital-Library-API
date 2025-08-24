@@ -286,45 +286,55 @@ const deleteBook = asyncHandler(async (req, res, next) => {
  *       500:
  *         description: Server error
  */
-
 const borrowBook = asyncHandler(async (req, res, next) => {
     try {
         const book = await Book.findById(req.params.id);
         if (!book) return res.status(404).json({ message: 'Book not found' });
+
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
         // Check if the user has an active subscription
-        const activeSubscription = await ActiveSubscription.findOne({ user: req.user._id });
+        const activeSubscription = await ActiveSubscription.findOne({ user: user._id });
         let amountToPay = 0;
+
         if (activeSubscription) {
             const subscription = await Subscription.findById(activeSubscription.subscription_id);
-            const userTransactionsCount = await Transaction.countDocuments({ user: req.user._id, type: 'BORROW' });
+
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+
+            const userTransactionsCount = await Transaction.countDocuments({
+                user: user._id,
+                type: 'BORROW',
+                createdAt: { $gte: startOfMonth, $lte: endOfMonth }
+            });
+
             if (userTransactionsCount >= subscription.maximum_borrow) {
-                // user will pay with your money
+                // user will pay with their money
                 amountToPay = book.borrow_price_per_day;
-                if (req.user.money < amountToPay) {
+                if (user.money < amountToPay) {
                     return res.status(400).json({ message: 'Insufficient funds' });
-                }
-                else {
-                    // User has enough money, deduct it
-                    req.user.money -= amountToPay;
-                    await req.user.save();
+                } else {
+                    user.money -= amountToPay;
+                    await user.save();
                 }
             }
-        }
-        else {
+        } else {
+            // No subscription → user pays directly
             amountToPay = book.borrow_price_per_day;
-            if (req.user.money < amountToPay) {
-                    return res.status(400).json({ message: 'Insufficient funds' });
-                }
-                else {
-                    // User has enough money, deduct it
-                    req.user.money -= amountToPay;
-                    await req.user.save();
-                }
+            if (user.money < amountToPay) {
+                return res.status(400).json({ message: 'Insufficient funds' });
+            } else {
+                user.money -= amountToPay;
+                await user.save();
+            }
         }
 
         // Create a new transaction
         const transaction = await Transaction.create({
-            user: req.user._id,
+            user: user._id,
             book: book.id,
             type: 'BORROW',
             amount: amountToPay,
