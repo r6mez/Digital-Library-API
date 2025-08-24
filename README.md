@@ -64,28 +64,28 @@ The server will be running on http://localhost:5001.
 `(id, name)`
 
 **Book**
-`(id, name, author, description, cover_image_url, publication_date, category_id, book_type_id, buy_price, borrow_price_per_day, pdf_path, createdAt, updatedAt)`
+`(id, name, author, description, cover_image_url, publication_date, category, type, buy_price, borrow_price_per_day, pdf_path, createdAt, updatedAt)`
 
 **Owend Book**
-`(id, user_id, book_id, createdAt)`
+`(id, user, book, createdAt)`
 
 **Borrowed Book**
-`(id, user_id, book_id, borrow_date, return_date, createdAt)`
+`(id, user, book, borrow_date, return_date, createdAt)`
 
 **Subscription**
 `(id, name, maximum_borrow, price, duration_in_days)`
 
 **ActiveSubscription** 
-`(id, subscription_id, user_id, start_date, deadline, createdAt, updatedAt)`
+`(id, subscription, user, start_date, deadline, createdAt, updatedAt)`
 
 **Offer** 
-`(id, name, price, createdAt, updatedAt)`
+`(id, user, original_price, discounted_price, expiresAt, createdAt, updatedAt)`
 
 **OfferedBook**
-`(id, offer_id, book_id)`
+`(id, offer, book)`
 
 **Transaction** 
-`(id, user_id, amount, type, description, createdAt)`
+`(id, user, amount, type, description, createdAt)`
 * `type` can be `'PURCHASE'`, `'SUBSCRIPTION'`, `'BRROW'`, etc.
 
 
@@ -106,9 +106,9 @@ Books
 - **GET** `/books?name=<book_name>&type="type"&category="category"`
 - **GET** `/books/{id}` -> returns book details
 - **POST** `/books/{id}` -> add a new book
-    - name, author, category_id, format_id, buy_price, borrow_price_per_day, etc.
+    - name, author, category, format, buy_price, borrow_price_per_day, etc.
 - **PUT**  `/books/{id}` -> update book
-    - name, author, category_id, format_id, buy_price, borrow_price_per_day, etc.
+    - name, author, category, format, buy_price, borrow_price_per_day, etc.
 - **DELETE** `/books/{id}` -> deletes a book
 - **GET** `/books/{id}/pdf` -> return book file, path
 - **POST** `/books/{id}/buy` 
@@ -129,9 +129,15 @@ Subscription
 Offers
 - **POST** `/offer` 
 	- array of books ids
-	- -> response offer_id
+	- array of books ids
+	- -> response offer (include an `expiresAt` timestamp and expire after 24 hours)
 - **GET** `/offer/{id}` -> gets the offer, the price, the books included
 - **POST** `/offer/{id}/accept` -> buy all of the books in the offer with the discounted price
+
+Notes about expiry
+- Offers have an `expiresAt` field and by default expire 24 hours after creation.
+- Operations on expired offers (read, accept, update) will return HTTP 410 Gone with a message indicating the offer has expired.
+- Admins can still manage offers via admin endpoints, but expired offers are treated as gone by the standard offer endpoints (see API docs / Swagger for admin routes).
 
 
 ## 📝 Notes

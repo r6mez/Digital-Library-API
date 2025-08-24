@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-const createBookSchema = Joi.object({
+const bookSchema = Joi.object({
     name: Joi.string().required(),
     author: Joi.string().required(),
     description: Joi.string().allow(''),
@@ -13,4 +13,4 @@ const createBookSchema = Joi.object({
     pdf_path: Joi.string().allow('')
 });
 
-module.exports = { createBookSchema };
+module.exports = { bookSchema };
