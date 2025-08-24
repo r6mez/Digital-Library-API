@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getBooks, getBookById, createBook, updateBook, deleteBook, buyBook } = require('../controllers/bookController');
+const { getBooks, getBookById, createBook, updateBook, deleteBook, buyBook, borrowBook } = require('../controllers/bookController');
 const { protect } = require('../middleware/authMiddleware');
 const { createBookSchema } = require('../validators/bookValidator');
 const validate = require('../validators/validate');
@@ -12,6 +12,8 @@ router.get('/:id', getBookById);
 
 // Buy book
 router.post('/:id/buy', protect, buyBook);
+// borrow book
+router.post('/:id/borrow', protect, borrowBook);
 
 // Protected admin routes with validation
 router.post('/', protect, admin, validate(createBookSchema), createBook);
