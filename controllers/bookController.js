@@ -259,36 +259,110 @@ const deleteBook = asyncHandler(async (req, res, next) => {
     }
 });
 
+/**
+ * @swagger
+ * /books/{id}/borrow:
+ *   post:
+ *     summary: Borrow a book
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user:
+ *                 type: string
+ *               amount:
+ *                 type: number
+ *               description:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Book borrowed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 transaction:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     user:
+ *                       type: string
+ *                     book:
+ *                       type: string
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *       400:
+ *         description: Bad request (insufficient funds or already borrowed)
+ *       401:
+ *         description: Unauthorized (missing or invalid token)
+ *       404:
+ *         description: Book not found
+ *       500:
+ *         description: Server error
+ */
 
-// borrow book
-// @route POST /books/:id/borrow
-// @access User only
 const borrowBook = asyncHandler(async (req, res, next) => {
     try {
         const book = await Book.findById(req.params.id);
         if (!book) return res.status(404).json({ message: 'Book not found' });
         // Check if the user has an active subscription
-        const activeSubscription = await ActiveSubscription.findOne({ user: req.body.id });
+        const activeSubscription = await ActiveSubscription.findOne({ user: req.user._id });
+        let amountToPay = 0;
         if (activeSubscription) {
             const subscription = await Subscription.findById(activeSubscription.subscription_id);
-            const userTransactionsCount = await Transaction.countDocuments({ user: req.body.id, type: 'BORROW' });
+            const userTransactionsCount = await Transaction.countDocuments({ user: req.user._id, type: 'BORROW' });
             if (userTransactionsCount >= subscription.maximum_borrow) {
-                // money user is willing to pay
-                const amountToPay = subscription.price * (userTransactionsCount - subscription.maximum_borrow + 1);
-                return res.status(400).json({ message: 'Borrow limit reached for your subscription', amountToPay });
+                // user will pay with your money
+                amountToPay = book.borrow_price_per_day;
+                if (req.user.money < amountToPay) {
+                    return res.status(400).json({ message: 'Insufficient funds' });
+                }
+                else {
+                    // User has enough money, deduct it
+                    req.user.money -= amountToPay;
+                    await req.user.save();
+                }
             }
+        }
+        else {
+            amountToPay = book.borrow_price_per_day;
+            if (req.user.money < amountToPay) {
+                    return res.status(400).json({ message: 'Insufficient funds' });
+                }
+                else {
+                    // User has enough money, deduct it
+                    req.user.money -= amountToPay;
+                    await req.user.save();
+                }
         }
 
         // Create a new transaction
         const transaction = await Transaction.create({
-            user: req.body.id,
+            user: req.user._id,
             book: book.id,
             type: 'BORROW',
-            amount: req.body.amount,
-            description: req.body.description
+            amount: amountToPay,
+            description: `Borrowing book ${book.id}`
         });
 
-        res.status(201).json(transaction);
+        res.status(201).json({ message: 'Book borrowed successfully', transaction });
     } catch (err) {
         next(err);
     }
