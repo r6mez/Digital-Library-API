@@ -30,7 +30,7 @@ const asyncHandler = require('../utils/asyncHandler');
  *                     $ref: '#/components/schemas/Subscription'
  */
 const getSubscriptions = asyncHandler(async (req, res, next) => {
-  const subscriptions = await Subscription.find({ user: req.body.id });
+  const subscriptions = await Subscription.find({ user: req.user._id });
   res.status(200).json({
     success: true,
     data: subscriptions
@@ -84,7 +84,7 @@ const getSubscriptions = asyncHandler(async (req, res, next) => {
 const createSubscription = asyncHandler(async (req, res, next) => {
   const { name, maximum_borrow, price, duration_in_days } = req.body;
   const subscription = await Subscription.create({
-    user: req.body.id,
+    user: req.user._id,
     name,
     maximum_borrow,
     price,
@@ -152,7 +152,10 @@ const updateSubscription = asyncHandler(async (req, res, next) => {
     duration_in_days
   }, { new: true });
   if (!subscription) {
-    return next(new ErrorResponse(`Subscription not found`, 404));
+      res.status(404).json({
+      success: false,
+      message: 'Subscription not found'
+    });
   }
   res.status(200).json({
     success: true,
@@ -194,7 +197,10 @@ const updateSubscription = asyncHandler(async (req, res, next) => {
 const deleteSubscription = asyncHandler(async (req, res, next) => {
   const subscription = await Subscription.findByIdAndDelete(req.params.id);
   if (!subscription) {
-    return next(new ErrorResponse(`Subscription not found`, 404));
+     res.status(404).json({
+      success: false,
+      message: 'Subscription not found'
+    });
   }
   res.status(204).json({
     success: true,
@@ -249,7 +255,10 @@ const activateSubscription = asyncHandler(async (req, res, next) => {
     const { subscription_id, start_date, deadline } = req.body;
     const subscription = await Subscription.findById(subscription_id);
     if (!subscription) {
-      return next(new ErrorResponse(`Subscription not found`, 404));
+       res.status(404).json({
+      success: false,
+      message: 'Subscription not found'
+    });
 
     }
     const activeSubscription = await activeSubscriptionsModel.create({
@@ -304,7 +313,10 @@ const deactivateSubscription = asyncHandler(async (req, res, next) => {
   const { subscription_id } = req.body;
   const activeSubscription = await activeSubscriptionsModel.findByIdAndDelete(subscription_id);
   if (!activeSubscription) {
-    return next(new ErrorResponse(`Active subscription not found`, 404));
+      res.status(404).json({
+      success: false,
+      message: 'Active subscription not found'
+    });
   }
   res.status(204).json({
     success: true,
