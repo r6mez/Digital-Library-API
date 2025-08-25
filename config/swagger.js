@@ -30,7 +30,10 @@ const options = {
       { url: "http://localhost:5001" },
     ],
   },
-  apis: ['./docs/*.js', "./routes/*.js", "./controllers/*.js", "./models/*.js"],
+  apis: [
+    "./docs/controllersDocs/*.js",
+    "./docs/modelsDocs/*.js",
+  ],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
