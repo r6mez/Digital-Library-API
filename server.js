@@ -37,6 +37,7 @@ app.use('/offers', offerRoutes);
 app.use('/subscriptions', subscriptionRoutes);
 app.use('/transactions', transactionRoutes);
 
+
 app.get('/', (req, res) => {
   res.send('API is running...');
 });

@@ -24,15 +24,16 @@ const options = {
       { name: 'Types', description: 'Book types management' },
       { name: 'Categories', description: 'Book categories management' },
       { name: 'Books', description: 'Book endpoints' },
-      { name: 'Offers', description: 'offers endpoints' }
+      { name: 'Offers', description: 'Offers endpoints' }
     ],
     servers: [
-      {
-        url: "http://localhost:5001", 
-      },
+      { url: "http://localhost:5001" },
     ],
   },
-  apis: ["./routes/*.js", "./controllers/*.js", "./models/*.js"],
+  apis: [
+    "./docs/controllersDocs/*.js",
+    "./docs/modelsDocs/*.js",
+  ],
 };
 
 const swaggerSpec = swaggerJsdoc(options);

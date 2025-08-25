@@ -1,54 +1,11 @@
-/**
-const Book = require('../models/bookModel');
- *     summary: Get all books with pagination and optional filters
- *     tags: [Books]
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
- *       - in: query
- *         name: name
- *         schema:
- *           type: string
- *       - in: query
- *         name: type
- *         schema:
- *           type: string
- *       - in: query
- *         name: category
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Paged list of books
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 page:
- *                   type: integer
- *                 total:
- *                   type: integer
- *                 books:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Book'
- *       500:
- *         description: Server error
- */
+
 const Book = require('../models/bookModel');
 const asyncHandler = require('../utils/asyncHandler');
 const User = require('../models/userModel');
-const OwendBook = require('../models/owendBookModel');
+const OwnedBook = require('../models/owendBookModel');
 const Transaction = require('../models/transactionModel');
+const path = require('path');
+const fs = require('fs');  
 
 const getBooks = asyncHandler(async (req, res, next) => {
     try {
@@ -77,28 +34,6 @@ const getBooks = asyncHandler(async (req, res, next) => {
     }
 });
 
-/**
- * @swagger
- * /books/{id}:
- *   get:
- *     summary: Get a book by its ID
- *     tags: [Books]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Book object
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Book'
- *       404:
- *         description: Book not found
- */
 const getBookById = asyncHandler(async (req, res, next) => {
     try {
         const book = await Book.findById(req.params.id)
@@ -112,32 +47,6 @@ const getBookById = asyncHandler(async (req, res, next) => {
     }
 });
 
-/**
- * @swagger
- * /books:
- *   post:
- *     summary: Create a new book (admin only)
- *     tags: [Books]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Book'
- *     responses:
- *       201:
- *         description: Book created
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Book'
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Server error
- */
 const createBook = asyncHandler(async (req, res, next) => {
     try {
         const book = await Book.create(req.body);
@@ -147,38 +56,6 @@ const createBook = asyncHandler(async (req, res, next) => {
     }
 });
 
-/**
- * @swagger
- * /books/{id}:
- *   put:
- *     summary: Update a book (admin only)
- *     tags: [Books]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Book'
- *     responses:
- *       200:
- *         description: Updated book
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Book'
- *       404:
- *         description: Book not found
- *       401:
- *         description: Unauthorized
- */
 const updateBook = asyncHandler(async (req, res, next) => {
     try {
         const updatedBook = await Book.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -189,35 +66,6 @@ const updateBook = asyncHandler(async (req, res, next) => {
     }
 });
 
-/**
- * @swagger
- * /books/{id}:
- *   delete:
- *     summary: Delete a book (admin only)
- *     tags: [Books]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Book deleted
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *       404:
- *         description: Book not found
- *       401:
- *         description: Unauthorized
- */
 const deleteBook = asyncHandler(async (req, res, next) => {
     try {
         const book = await Book.findByIdAndDelete(req.params.id);
@@ -228,64 +76,6 @@ const deleteBook = asyncHandler(async (req, res, next) => {
     }
 });
 
-/**
- * @swagger
- * /books/{id}/borrow:
- *   post:
- *     summary: Borrow a book
- *     tags: [Books]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               user:
- *                 type: string
- *               amount:
- *                 type: number
- *               description:
- *                 type: string
- *     responses:
- *       201:
- *         description: Book borrowed successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 transaction:
- *                   type: object
- *                   properties:
- *                     _id:
- *                       type: string
- *                     user:
- *                       type: string
- *                     book:
- *                       type: string
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *       400:
- *         description: Bad request (insufficient funds or already borrowed)
- *       401:
- *         description: Unauthorized (missing or invalid token)
- *       404:
- *         description: Book not found
- *       500:
- *         description: Server error
- */
 const borrowBook = asyncHandler(async (req, res, next) => {
     try {
         const book = await Book.findById(req.params.id);
@@ -347,52 +137,6 @@ const borrowBook = asyncHandler(async (req, res, next) => {
     }
 });
 
-/**
- * @swagger
- * /books/{id}/buy:
- *   post:
- *     summary: Buy a book
- *     tags: [Books]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: ID of the book to purchase
- *     responses:
- *       200:
- *         description: Book purchased successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 owned:
- *                   type: object
- *                   properties:
- *                     _id:
- *                       type: string
- *                     user:
- *                       type: string
- *                     book:
- *                       type: string
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *       400:
- *         description: Bad request (insufficient funds or already owned)
- *       401:
- *         description: Unauthorized (missing or invalid token)
- *       404:
- *         description: Book not found
- *       500:
- *         description: Server error
- */
 const buyBook = asyncHandler(async (req, res, next) => {
     const user = req.user; // set by protect middleware
     const bookId = req.params.id;
@@ -402,7 +146,7 @@ const buyBook = asyncHandler(async (req, res, next) => {
     if (!book) return res.status(404).json({ message: 'Book not found' });
 
     // Check if user already owns the book
-    const alreadyOwned = await OwendBook.findOne({ user: user._id, book: book._id });
+    const alreadyOwned = await OwnedBook.findOne({ user: user._id, book: book._id });
     if (alreadyOwned) return res.status(400).json({ message: 'You already own this book' });
 
     // Check user balance
@@ -415,7 +159,7 @@ const buyBook = asyncHandler(async (req, res, next) => {
     await user.save();
 
     // Create ownership record
-    const owned = await OwendBook.create({ user: user._id, book: book._id });
+    const owned = await OwnedBook.create({ user: user._id, book: book._id });
 
     // Create transaction record
     await Transaction.create({
@@ -428,4 +172,72 @@ const buyBook = asyncHandler(async (req, res, next) => {
     res.json({ message: 'Book purchased successfully', owned });
 });
 
-module.exports = { getBooks, getBookById, createBook, updateBook, deleteBook, borrowBook, buyBook };
+// @desc    Upload PDF for a Book (Admin)
+// @route   POST /api/books/:id/pdf
+// @access  Private/Admin
+const uploadBookPDF = asyncHandler(async (req, res) => {
+    const book = await Book.findById(req.params.id);
+    if (!book) return res.status(404).json({ message: 'Book not found' });
+
+    if (!req.file) {
+        return res.status(400).json({ message: 'No PDF uploaded' });
+    }
+
+    // Store relative path
+    book.pdf_path = `/pdfs/${req.file.filename}`;
+    await book.save();
+
+    res.json({
+        message: 'PDF uploaded successfully',
+        pdf_url: book.pdf_path,
+    });
+});
+
+
+// @desc    Get PDF URL (User must own the book)
+// @route   GET /api/books/:id/pdf
+// @access  Private
+const getBookPDF = asyncHandler(async (req, res) => {
+    const book = await Book.findById(req.params.id);
+    if (!book || !book.pdf_path) return res.status(404).json({ message: 'PDF as not found' });
+
+    const hasAccess = await OwnedBook.findOne({ user: req.user._id, book: book._id });
+    if (!hasAccess) {
+        return res.status(403).json({ message: 'Access denied' });
+    }
+
+    res.json({ pdf_url: book.pdf_path });
+});
+
+
+
+const previewPDF = asyncHandler(async (req, res) => {
+    const book = await Book.findById(req.params.id);
+    if (!book || !book.pdf_path) {
+        return res.status(404).json({ message: 'PDF not found' });
+    }
+
+    const filePath = path.join(__dirname, '..', 'uploads', book.pdf_path.replace('/pdfs/', 'pdfs/'));
+
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ message: 'File not found on server' });
+    }
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline');
+    fs.createReadStream(filePath).pipe(res);
+});
+
+
+
+module.exports = { getBooks,
+     getBookById,
+      createBook,
+     updateBook,
+      deleteBook,
+       borrowBook,
+       buyBook,
+       uploadBookPDF,
+       getBookPDF,
+    previewPDF
+    };
