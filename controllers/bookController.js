@@ -47,8 +47,10 @@ const Book = require('../models/bookModel');
 const Book = require('../models/bookModel');
 const asyncHandler = require('../utils/asyncHandler');
 const User = require('../models/userModel');
-const OwendBook = require('../models/owendBookModel');
+const OwnedBook = require('../models/owendBookModel');
 const Transaction = require('../models/transactionModel');
+const cloudinary = require('../config/cloudinary');
+const fs = require('fs');
 
 const getBooks = asyncHandler(async (req, res, next) => {
     try {
@@ -112,32 +114,32 @@ const getBookById = asyncHandler(async (req, res, next) => {
     }
 });
 
-/**
- * @swagger
- * /books:
- *   post:
- *     summary: Create a new book (admin only)
- *     tags: [Books]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Book'
- *     responses:
- *       201:
- *         description: Book created
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Book'
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Server error
- */
+    /**
+     * @swagger
+     * /books:
+     *   post:
+     *     summary: Create a new book (admin only)
+     *     tags: [Books]
+     *     security:
+     *       - bearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/Book'
+     *     responses:
+     *       201:
+     *         description: Book created
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Book'
+     *       401:
+     *         description: Unauthorized
+     *       500:
+     *         description: Server error
+     */
 const createBook = asyncHandler(async (req, res, next) => {
     try {
         const book = await Book.create(req.body);
@@ -402,7 +404,7 @@ const buyBook = asyncHandler(async (req, res, next) => {
     if (!book) return res.status(404).json({ message: 'Book not found' });
 
     // Check if user already owns the book
-    const alreadyOwned = await OwendBook.findOne({ user: user._id, book: book._id });
+    const alreadyOwned = await OwnedBook.findOne({ user: user._id, book: book._id });
     if (alreadyOwned) return res.status(400).json({ message: 'You already own this book' });
 
     // Check user balance
@@ -428,4 +430,136 @@ const buyBook = asyncHandler(async (req, res, next) => {
     res.json({ message: 'Book purchased successfully', owned });
 });
 
-module.exports = { getBooks, getBookById, createBook, updateBook, deleteBook, borrowBook, buyBook };
+/**
+ * @swagger
+ * /api/books/{id}/pdf:
+ *   post:
+ *     summary: Upload PDF for a specific book
+ *     description: Allows an admin to upload a PDF file for a specific book. Requires admin privileges.
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the book to upload the PDF for.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               pdf:
+ *                 type: string
+ *                 format: binary
+ *                 description: The PDF file to upload.
+ *     responses:
+ *       200:
+ *         description: PDF uploaded successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: PDF uploaded successfully
+ *                 pdf_url:
+ *                   type: string
+ *                   example: https://res.cloudinary.com/demo/book.pdf
+ *       400:
+ *         description: Bad Request (Invalid file or missing PDF)
+ *       401:
+ *         description: Unauthorized (No token provided)
+ *       403:
+ *         description: Forbidden (Not an admin)
+ *       404:
+ *         description: Book not found
+ */
+
+// @desc    Upload PDF for a Book (Admin)
+// @route   POST /api/books/:id/pdf
+// @access  Private/Admin
+const uploadBookPDF = asyncHandler(async (req, res) => {
+    const book = await Book.findById(req.params.id);
+    if (!book) return res.status(404).json({ message: 'Book not found' });
+    console.log(req.file);
+
+    if (!req.file || !req.file.path) {
+        return res.status(400).json({ message: 'No PDF uploaded' });
+    }
+
+    book.pdf_path = req.file.path; // Cloudinary URL provided by multer-storage-cloudinary
+    await book.save();
+
+    res.json({
+        message: 'PDF uploaded successfully',
+        pdf_url: book.pdf_path
+    });
+});
+
+
+/**
+ * @swagger
+ * /api/books/{id}/pdf:
+ *   get:
+ *     summary: Get PDF URL for a specific book
+ *     description: Returns the PDF URL if the user has access (owns the book or it's free).
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the book to retrieve the PDF URL for.
+ *     responses:
+ *       200:
+ *         description: PDF URL retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 pdf_url:
+ *                   type: string
+ *                   example: https://res.cloudinary.com/demo/book.pdf
+ *       401:
+ *         description: Unauthorized (No token provided)
+ *       403:
+ *         description: Forbidden (User doesn't own book and it's not free)
+ *       404:
+ *         description: Book or PDF not found
+ */
+// @desc    Get PDF URL (User must own the book)
+// @route   GET /api/books/:id/pdf
+// @access  Private
+const getBookPDF = asyncHandler(async (req, res) => {
+    const book = await Book.findById(req.params.id);
+    if (!book || !book.pdf_path) return res.status(404).json({ message: 'PDF not found' });
+
+    const hasAccess = await OwnedBook.findOne({ user: req.user._id, book: book._id });
+    if (!hasAccess) {
+        return res.status(403).json({ message: 'Access denied' });
+    }
+
+    res.json({ pdf_url: book.pdf_path });
+});
+
+
+module.exports = { getBooks,
+     getBookById,
+      createBook,
+     updateBook,
+      deleteBook,
+       borrowBook,
+       buyBook,
+       uploadBookPDF,
+       getBookPDF
+    };
