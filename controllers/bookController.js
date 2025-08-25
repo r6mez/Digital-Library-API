@@ -1,5 +1,7 @@
 /**
-const Book = require('../models/bookModel');
+ * @swagger
+ * /books:
+ *   get:
  *     summary: Get all books with pagination and optional filters
  *     tags: [Books]
  *     parameters:
@@ -49,8 +51,6 @@ const asyncHandler = require('../utils/asyncHandler');
 const User = require('../models/userModel');
 const OwnedBook = require('../models/owendBookModel');
 const Transaction = require('../models/transactionModel');
-const cloudinary = require('../config/cloudinary');
-const fs = require('fs');
 
 const getBooks = asyncHandler(async (req, res, next) => {
     try {
@@ -417,7 +417,7 @@ const buyBook = asyncHandler(async (req, res, next) => {
     await user.save();
 
     // Create ownership record
-    const owned = await OwendBook.create({ user: user._id, book: book._id });
+    const owned = await OwnedBook.create({ user: user._id, book: book._id });
 
     // Create transaction record
     await Transaction.create({
@@ -487,7 +487,7 @@ const buyBook = asyncHandler(async (req, res, next) => {
 const uploadBookPDF = asyncHandler(async (req, res) => {
     const book = await Book.findById(req.params.id);
     if (!book) return res.status(404).json({ message: 'Book not found' });
-    console.log(req.file);
+    // console.log(req.file);
 
     if (!req.file || !req.file.path) {
         return res.status(400).json({ message: 'No PDF uploaded' });
@@ -542,7 +542,9 @@ const uploadBookPDF = asyncHandler(async (req, res) => {
 // @access  Private
 const getBookPDF = asyncHandler(async (req, res) => {
     const book = await Book.findById(req.params.id);
-    if (!book || !book.pdf_path) return res.status(404).json({ message: 'PDF not found' });
+    console.log("Book PDF:", book);
+    console.log(req.params.id);
+    if (!book || !book.pdf_path) return res.status(404).json({ message: 'PDF as not found' });
 
     const hasAccess = await OwnedBook.findOne({ user: req.user._id, book: book._id });
     if (!hasAccess) {

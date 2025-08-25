@@ -27,7 +27,7 @@ router.get('/:id/pdf', protect, getBookPDF);
 
 
 
-// router.post('/test-upload', upload.single('pdf'), (req, res) => {
+// router.post('/test', upload.single('pdf'), (req, res) => {
     
 //     console.log("Cloudinary ENV:", {
 //         cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
