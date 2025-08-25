@@ -22,6 +22,7 @@ connectDB();
 const app = express();
 
 // Middleware to parse JSON bodies
+app.use(express.json());
 
 // Swagger Route
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -36,7 +37,6 @@ app.use('/offers', offerRoutes);
 app.use('/subscriptions', subscriptionRoutes);
 app.use('/transactions', transactionRoutes);
 
-app.use(express.json());
 
 app.get('/', (req, res) => {
   res.send('API is running...');
