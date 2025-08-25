@@ -3,11 +3,55 @@ const asyncHandler = require('../utils/asyncHandler');
 
 
 // Create a new transaction
+/**
+ * @swagger
+ * /api/v1/transactions:
+ *   post:
+ *     summary: Create a new transaction
+ *     description: Create a new transaction for the authenticated user
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               bookId:
+ *                 type: string
+ *               amount:
+ *                 type: number
+ *               type:
+ *                 type: string
+ *                 enum: [borrow, return]
+ *               description:
+ *                 type: string
+ *             required:
+ *               - bookId
+ *               - amount
+ *               - type
+ *               - description
+ *     responses:
+ *       201:
+ *         description: Transaction created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/Transaction'
+ */
 const createTransaction = asyncHandler(async (req, res) => {
     const { bookId, amount, type, description } = req.body;
 
     const transaction = await Transaction.create({
-        user: req.body.id,
+        user: req.user._id,
         book: bookId,
         type,
         amount,
@@ -22,11 +66,54 @@ const createTransaction = asyncHandler(async (req, res) => {
 });
 
 // Get a transaction by ID
+/**
+ * @swagger
+ * /api/v1/transactions/{id}:
+ *   get:
+ *     summary: Get a transaction by ID
+ *     description: Retrieve a transaction by its ID
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the transaction to retrieve
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Transaction retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/Transaction'
+ *       404:
+ *         description: Transaction not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Transaction not found
+ */
 const getTransactionById = asyncHandler(async (req, res) => {
     const transaction = await Transaction.findById(req.params.id).populate('user book');
 
     if (!transaction) {
-        return res.status(404).json({
+        res.status(404).json({
             success: false,
             message: 'Transaction not found'
         });
@@ -39,6 +126,70 @@ const getTransactionById = asyncHandler(async (req, res) => {
 });
 
 // Update a transaction
+/**
+ * @swagger
+ * /api/v1/transactions/{id}:
+ *   put:
+ *     summary: Update a transaction
+ *     description: Update an existing transaction for the authenticated user
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the transaction to update
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               bookId:
+ *                 type: string
+ *               amount:
+ *                 type: number
+ *               type:
+ *                 type: string
+ *                 enum: [borrow, return]
+ *               description:
+ *                 type: string
+ *             required:
+ *               - bookId
+ *               - amount
+ *               - type
+ *               - description
+ *     responses:
+ *       200:
+ *         description: Transaction updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/Transaction'
+ *       404:
+ *         description: Transaction not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Transaction not found
+ */
 const updateTransaction = asyncHandler(async (req, res) => {
     const transaction = await Transaction.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
@@ -46,7 +197,7 @@ const updateTransaction = asyncHandler(async (req, res) => {
     });
 
     if (!transaction) {
-        return res.status(404).json({
+        res.status(404).json({
             success: false,
             message: 'Transaction not found'
         });
@@ -59,11 +210,41 @@ const updateTransaction = asyncHandler(async (req, res) => {
 });
 
 // Delete a transaction
+/**
+ * @swagger
+ * /api/v1/transactions/{id}:
+ *   delete:
+ *     summary: Delete a transaction
+ *     description: Delete an existing transaction for the authenticated user
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the transaction to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Transaction deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: null
+ */
 const deleteTransaction = asyncHandler(async (req, res) => {
     const transaction = await Transaction.findByIdAndDelete(req.params.id);
 
     if (!transaction) {
-        return res.status(404).json({
+        res.status(404).json({
             success: false,
             message: 'Transaction not found'
         });
