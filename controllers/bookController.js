@@ -1,51 +1,4 @@
-/**
- * @swagger
- * /books:
- *   get:
- *     summary: Get all books with pagination and optional filters
- *     tags: [Books]
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
- *       - in: query
- *         name: name
- *         schema:
- *           type: string
- *       - in: query
- *         name: type
- *         schema:
- *           type: string
- *       - in: query
- *         name: category
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Paged list of books
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 page:
- *                   type: integer
- *                 total:
- *                   type: integer
- *                 books:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Book'
- *       500:
- *         description: Server error
- */
+
 const Book = require('../models/bookModel');
 const asyncHandler = require('../utils/asyncHandler');
 const User = require('../models/userModel');
@@ -79,28 +32,6 @@ const getBooks = asyncHandler(async (req, res, next) => {
     }
 });
 
-/**
- * @swagger
- * /books/{id}:
- *   get:
- *     summary: Get a book by its ID
- *     tags: [Books]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Book object
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Book'
- *       404:
- *         description: Book not found
- */
 const getBookById = asyncHandler(async (req, res, next) => {
     try {
         const book = await Book.findById(req.params.id)
@@ -114,32 +45,6 @@ const getBookById = asyncHandler(async (req, res, next) => {
     }
 });
 
-    /**
-     * @swagger
-     * /books:
-     *   post:
-     *     summary: Create a new book (admin only)
-     *     tags: [Books]
-     *     security:
-     *       - bearerAuth: []
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             $ref: '#/components/schemas/Book'
-     *     responses:
-     *       201:
-     *         description: Book created
-     *         content:
-     *           application/json:
-     *             schema:
-     *               $ref: '#/components/schemas/Book'
-     *       401:
-     *         description: Unauthorized
-     *       500:
-     *         description: Server error
-     */
 const createBook = asyncHandler(async (req, res, next) => {
     try {
         const book = await Book.create(req.body);
@@ -149,38 +54,6 @@ const createBook = asyncHandler(async (req, res, next) => {
     }
 });
 
-/**
- * @swagger
- * /books/{id}:
- *   put:
- *     summary: Update a book (admin only)
- *     tags: [Books]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Book'
- *     responses:
- *       200:
- *         description: Updated book
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Book'
- *       404:
- *         description: Book not found
- *       401:
- *         description: Unauthorized
- */
 const updateBook = asyncHandler(async (req, res, next) => {
     try {
         const updatedBook = await Book.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -191,35 +64,6 @@ const updateBook = asyncHandler(async (req, res, next) => {
     }
 });
 
-/**
- * @swagger
- * /books/{id}:
- *   delete:
- *     summary: Delete a book (admin only)
- *     tags: [Books]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Book deleted
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *       404:
- *         description: Book not found
- *       401:
- *         description: Unauthorized
- */
 const deleteBook = asyncHandler(async (req, res, next) => {
     try {
         const book = await Book.findByIdAndDelete(req.params.id);
@@ -230,64 +74,6 @@ const deleteBook = asyncHandler(async (req, res, next) => {
     }
 });
 
-/**
- * @swagger
- * /books/{id}/borrow:
- *   post:
- *     summary: Borrow a book
- *     tags: [Books]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               user:
- *                 type: string
- *               amount:
- *                 type: number
- *               description:
- *                 type: string
- *     responses:
- *       201:
- *         description: Book borrowed successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 transaction:
- *                   type: object
- *                   properties:
- *                     _id:
- *                       type: string
- *                     user:
- *                       type: string
- *                     book:
- *                       type: string
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *       400:
- *         description: Bad request (insufficient funds or already borrowed)
- *       401:
- *         description: Unauthorized (missing or invalid token)
- *       404:
- *         description: Book not found
- *       500:
- *         description: Server error
- */
 const borrowBook = asyncHandler(async (req, res, next) => {
     try {
         const book = await Book.findById(req.params.id);
@@ -349,52 +135,6 @@ const borrowBook = asyncHandler(async (req, res, next) => {
     }
 });
 
-/**
- * @swagger
- * /books/{id}/buy:
- *   post:
- *     summary: Buy a book
- *     tags: [Books]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: ID of the book to purchase
- *     responses:
- *       200:
- *         description: Book purchased successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 owned:
- *                   type: object
- *                   properties:
- *                     _id:
- *                       type: string
- *                     user:
- *                       type: string
- *                     book:
- *                       type: string
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *       400:
- *         description: Bad request (insufficient funds or already owned)
- *       401:
- *         description: Unauthorized (missing or invalid token)
- *       404:
- *         description: Book not found
- *       500:
- *         description: Server error
- */
 const buyBook = asyncHandler(async (req, res, next) => {
     const user = req.user; // set by protect middleware
     const bookId = req.params.id;
@@ -430,57 +170,6 @@ const buyBook = asyncHandler(async (req, res, next) => {
     res.json({ message: 'Book purchased successfully', owned });
 });
 
-/**
- * @swagger
- * /api/books/{id}/pdf:
- *   post:
- *     summary: Upload PDF for a specific book
- *     description: Allows an admin to upload a PDF file for a specific book. Requires admin privileges.
- *     tags: [Books]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: ID of the book to upload the PDF for.
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               pdf:
- *                 type: string
- *                 format: binary
- *                 description: The PDF file to upload.
- *     responses:
- *       200:
- *         description: PDF uploaded successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: PDF uploaded successfully
- *                 pdf_url:
- *                   type: string
- *                   example: https://res.cloudinary.com/demo/book.pdf
- *       400:
- *         description: Bad Request (Invalid file or missing PDF)
- *       401:
- *         description: Unauthorized (No token provided)
- *       403:
- *         description: Forbidden (Not an admin)
- *       404:
- *         description: Book not found
- */
-
 // @desc    Upload PDF for a Book (Admin)
 // @route   POST /api/books/:id/pdf
 // @access  Private/Admin
@@ -503,40 +192,6 @@ const uploadBookPDF = asyncHandler(async (req, res) => {
 });
 
 
-/**
- * @swagger
- * /api/books/{id}/pdf:
- *   get:
- *     summary: Get PDF URL for a specific book
- *     description: Returns the PDF URL if the user has access (owns the book or it's free).
- *     tags: [Books]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: ID of the book to retrieve the PDF URL for.
- *     responses:
- *       200:
- *         description: PDF URL retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 pdf_url:
- *                   type: string
- *                   example: https://res.cloudinary.com/demo/book.pdf
- *       401:
- *         description: Unauthorized (No token provided)
- *       403:
- *         description: Forbidden (User doesn't own book and it's not free)
- *       404:
- *         description: Book or PDF not found
- */
 // @desc    Get PDF URL (User must own the book)
 // @route   GET /api/books/:id/pdf
 // @access  Private
