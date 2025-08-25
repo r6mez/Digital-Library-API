@@ -4,6 +4,8 @@ const asyncHandler = require('../utils/asyncHandler');
 const User = require('../models/userModel');
 const OwnedBook = require('../models/owendBookModel');
 const Transaction = require('../models/transactionModel');
+const path = require('path');
+const fs = require('fs');  
 
 const getBooks = asyncHandler(async (req, res, next) => {
     try {
@@ -176,18 +178,18 @@ const buyBook = asyncHandler(async (req, res, next) => {
 const uploadBookPDF = asyncHandler(async (req, res) => {
     const book = await Book.findById(req.params.id);
     if (!book) return res.status(404).json({ message: 'Book not found' });
-    // console.log(req.file);
 
-    if (!req.file || !req.file.path) {
+    if (!req.file) {
         return res.status(400).json({ message: 'No PDF uploaded' });
     }
 
-    book.pdf_path = req.file.path; // Cloudinary URL provided by multer-storage-cloudinary
+    // Store relative path
+    book.pdf_path = `/pdfs/${req.file.filename}`;
     await book.save();
 
     res.json({
         message: 'PDF uploaded successfully',
-        pdf_url: book.pdf_path
+        pdf_url: book.pdf_path,
     });
 });
 
@@ -197,8 +199,6 @@ const uploadBookPDF = asyncHandler(async (req, res) => {
 // @access  Private
 const getBookPDF = asyncHandler(async (req, res) => {
     const book = await Book.findById(req.params.id);
-    console.log("Book PDF:", book);
-    console.log(req.params.id);
     if (!book || !book.pdf_path) return res.status(404).json({ message: 'PDF as not found' });
 
     const hasAccess = await OwnedBook.findOne({ user: req.user._id, book: book._id });
@@ -210,6 +210,26 @@ const getBookPDF = asyncHandler(async (req, res) => {
 });
 
 
+
+const previewPDF = asyncHandler(async (req, res) => {
+    const book = await Book.findById(req.params.id);
+    if (!book || !book.pdf_path) {
+        return res.status(404).json({ message: 'PDF not found' });
+    }
+
+    const filePath = path.join(__dirname, '..', 'uploads', book.pdf_path.replace('/pdfs/', 'pdfs/'));
+
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ message: 'File not found on server' });
+    }
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline');
+    fs.createReadStream(filePath).pipe(res);
+});
+
+
+
 module.exports = { getBooks,
      getBookById,
       createBook,
@@ -218,5 +238,6 @@ module.exports = { getBooks,
        borrowBook,
        buyBook,
        uploadBookPDF,
-       getBookPDF
+       getBookPDF,
+    previewPDF
     };

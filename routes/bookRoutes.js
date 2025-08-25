@@ -2,12 +2,21 @@ const express = require('express');
 const router = express.Router();
 
 
-const { getBooks, getBookById, createBook, updateBook, deleteBook, buyBook, borrowBook, uploadBookPDF, getBookPDF } = require('../controllers/bookController');
+const { getBooks,
+     getBookById,
+      createBook,
+       updateBook,
+        deleteBook,
+         buyBook,
+          borrowBook,
+          uploadBookPDF,
+          getBookPDF,
+          previewPDF } = require('../controllers/bookController');
 const validate = require('../validators/validate');
 
 const { protect } = require('../middleware/authMiddleware');
 const { admin } = require('../middleware/adminMiddleware');
-const upload = require('../middleware/cloudinaryUpload');
+const upload = require('../middleware/upload');
 const { bookSchema } = require('../validators/bookValidator');
 
 
@@ -24,6 +33,7 @@ router.delete('/:id', protect, admin, deleteBook);
 
 router.post('/:id/pdf', protect, admin, upload.single('pdf'), uploadBookPDF);
 router.get('/:id/pdf', protect, getBookPDF);
+router.get('/:id/preview', protect, previewPDF);
 
 
 
