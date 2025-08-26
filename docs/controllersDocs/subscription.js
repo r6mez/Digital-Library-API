@@ -1,6 +1,6 @@
 /**
  * @swagger
- * /api/v1/subscriptions:
+ * /subscriptions:
  *   get:
  *     summary: Get all subscriptions
  *     description: Retrieve a list of all subscriptions for the authenticated user
@@ -27,7 +27,7 @@
 
 /**
  * @swagger
- * /api/v1/subscriptions:
+ * /subscriptions:
  *   post:
  *     summary: Create a new subscription
  *     description: Create a new subscription for the authenticated user
@@ -72,7 +72,7 @@
 
 /**
  * @swagger
- * /api/v1/subscriptions/{id}:
+ * /subscriptions/{id}:
  *   put:
  *     summary: Update a subscription
  *     description: Update an existing subscription for the authenticated user
@@ -121,7 +121,7 @@
 
 /**
  * @swagger
- * /api/v1/subscriptions/{id}:
+ * /subscriptions/{id}:
  *   delete:
  *     summary: Delete a subscription
  *     description: Delete an existing subscription for the authenticated user
@@ -153,7 +153,7 @@
 
 /**
  * @swagger
- * /api/v1/subscriptions/activate:
+ * /subscriptions/activate:
  *   post:
  *     summary: Activate a subscription
  *     description: Activate a subscription for the authenticated user
@@ -197,7 +197,7 @@
 
 /**
  * @swagger
- * /api/v1/subscriptions/deactivate:
+ * /subscriptions/deactivate:
  *   post:
  *     summary: Deactivate a subscription
  *     description: Deactivate a subscription for the authenticated user
