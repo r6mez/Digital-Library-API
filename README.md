@@ -145,3 +145,11 @@ Notes about expiry
 - **Authorization**: Implement **Role-Based Access Control (RBAC)**. A middleware should check for the `isAdmin` flag on user profiles to protect all `/*` routes.
 - **Input Validation**: All incoming data from request bodies must be validated to ensure it's in the correct format and prevent security vulnerabilities. Use a library like `Joi` or `express-validator`.
 - **Error Handling**: Create a centralized error handling mechanism. Use standard HTTP status codes (`400`, `401`, `403`, `404`, `500`) and return meaningful JSON error messages.
+
+## TEST 
+
+- [x] user controller 
+- [x] book controller 
+- [ ] offer
+- [ ] borrow logic 
+- [ ] subscription controller 

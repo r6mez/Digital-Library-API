@@ -136,40 +136,58 @@ const borrowBook = asyncHandler(async (req, res, next) => {
         next(err);
     }
 });
-
-const buyBook = asyncHandler(async (req, res, next) => {
-    const user = req.user; // set by protect middleware
+const buyBook = asyncHandler(async (req, res) => {
+    const userId = req.user._id;
     const bookId = req.params.id;
 
-    // Validate book existence
-    const book = await Book.findById(bookId);
-    if (!book) return res.status(404).json({ message: 'Book not found' });
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    // Check if user already owns the book
-    const alreadyOwned = await OwnedBook.findOne({ user: user._id, book: book._id });
-    if (alreadyOwned) return res.status(400).json({ message: 'You already own this book' });
+    try {
+        // 1. Validate book existence
+        const book = await Book.findById(bookId).session(session);
+        if (!book) {
+            await session.abortTransaction();
+            return res.status(404).json({ message: 'Book not found' });
+        }
 
-    // Check user balance
-    if (user.money < book.buy_price) {
-        return res.status(400).json({ message: 'Insufficient funds' });
+        // 2. Check if user already owns the book
+        const alreadyOwned = await OwnedBook.findOne({ user: userId, book: book._id }).session(session);
+        if (alreadyOwned) {
+            await session.abortTransaction();
+            return res.status(400).json({ message: 'You already own this book' });
+        }
+
+        // 3. Deduct money atomically
+        const updatedUser = await User.findOneAndUpdate(
+            { _id: userId, money: { $gte: book.buy_price } }, 
+            { $inc: { money: -book.buy_price } },           
+            { new: true, session }
+        );
+        if (!updatedUser) {
+            await session.abortTransaction();
+            return res.status(400).json({ message: 'Insufficient funds' });
+        }
+
+        // 4. Create ownership record
+        const owned = await OwnedBook.create([{ user: userId, book: book._id }], { session });
+
+        // 5. Create transaction record
+        await Transaction.create([{
+            user: userId,
+            amount: book.buy_price,
+            type: 'PURCHASE',
+            description: `Purchase of book ${book._id}`
+        }], { session });
+
+        await session.commitTransaction();
+        res.json({ message: 'Book purchased successfully', owned });
+    } catch (err) {
+        await session.abortTransaction();
+        res.status(500).json({ message: err.message });
+    } finally {
+        session.endSession();
     }
-
-    // Deduct money and save user
-    user.money = Number(user.money) - Number(book.buy_price);
-    await user.save();
-
-    // Create ownership record
-    const owned = await OwnedBook.create({ user: user._id, book: book._id });
-
-    // Create transaction record
-    await Transaction.create({
-        user: user._id,
-        amount: book.buy_price,
-        type: 'PURCHASE',
-        description: `Purchase of book ${book._id}`
-    });
-
-    res.json({ message: 'Book purchased successfully', owned });
 });
 
 // @desc    Upload PDF for a Book (Admin)
