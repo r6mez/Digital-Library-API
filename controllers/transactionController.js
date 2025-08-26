@@ -7,7 +7,7 @@ const createTransaction = asyncHandler(async (req, res) => {
     const { bookId, amount, type, description } = req.body;
 
     const transaction = await Transaction.create({
-        user: req.body.id,
+        user: req.user._id,
         book: bookId,
         type,
         amount,
