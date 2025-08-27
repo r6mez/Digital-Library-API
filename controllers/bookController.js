@@ -3,6 +3,7 @@ const Book = require('../models/bookModel');
 const asyncHandler = require('../utils/asyncHandler');
 const User = require('../models/userModel');
 const OwnedBook = require('../models/owendBookModel');
+const borrowedBook = require('../models/borrowedBookModel');
 const Transaction = require('../models/transactionModel');
 const path = require('path');
 const fs = require('fs');  
@@ -76,66 +77,106 @@ const deleteBook = asyncHandler(async (req, res, next) => {
     }
 });
 
+const mongoose = require("mongoose");
+
 const borrowBook = asyncHandler(async (req, res, next) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
-        const book = await Book.findById(req.params.id);
-        if (!book) return res.status(404).json({ message: 'Book not found' });
+        const { days } = req.body;
+        const daysToBorrow = days && days > 0 ? days : 1;
 
-        const user = await User.findById(req.user._id);
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        const book = await Book.findById(req.params.id).session(session);
+        if (!book) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(404).json({ message: "Book not found" });
+        }
 
-        // Check if the user has an active subscription
-        const activeSubscription = await ActiveSubscription.findOne({ user: user._id });
+        const userId = req.user._id;
         let amountToPay = 0;
 
+        // --- Check subscription ---
+        const activeSubscription = await ActiveSubscription.findOne({ user: userId }).session(session);
+
         if (activeSubscription) {
-            const subscription = await Subscription.findById(activeSubscription.subscription_id);
+            const subscription = await Subscription.findById(activeSubscription.subscription_id).session(session);
 
             const now = new Date();
             const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
             const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
 
             const userTransactionsCount = await Transaction.countDocuments({
-                user: user._id,
-                type: 'BORROW',
+                user: userId,
+                type: "BORROW",
                 createdAt: { $gte: startOfMonth, $lte: endOfMonth }
-            });
+            }).session(session);
 
             if (userTransactionsCount >= subscription.maximum_borrow) {
-                // user will pay with their money
-                amountToPay = book.borrow_price_per_day;
-                if (user.money < amountToPay) {
-                    return res.status(400).json({ message: 'Insufficient funds' });
-                } else {
-                    user.money -= amountToPay;
-                    await user.save();
-                }
+                // exceeded quota → must pay
+                amountToPay = book.borrow_price_per_day * daysToBorrow;
             }
         } else {
-            // No subscription → user pays directly
-            amountToPay = book.borrow_price_per_day;
-            if (user.money < amountToPay) {
-                return res.status(400).json({ message: 'Insufficient funds' });
-            } else {
-                user.money -= amountToPay;
-                await user.save();
+            // no subscription → must pay
+            amountToPay = book.borrow_price_per_day * daysToBorrow;
+        }
+
+        // --- Deduct money atomically (only if need to pay) ---
+        if (amountToPay > 0) {
+            const updatedUser = await User.findOneAndUpdate(
+                { _id: userId, money: { $gte: amountToPay } }, 
+                { $inc: { money: -amountToPay } },             
+                { new: true, session }
+            );
+
+            if (!updatedUser) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(400).json({ message: "Insufficient funds" });
             }
         }
 
-        // Create a new transaction
-        const transaction = await Transaction.create({
-            user: user._id,
-            book: book.id,
-            type: 'BORROW',
-            amount: amountToPay,
-            description: `Borrowing book ${book.id}`
+        const transaction = await Transaction.create(
+            [{
+                user: userId,
+                book: book._id,
+                type: "BORROW",
+                amount: amountToPay,
+                description: `Borrowed ${book.title} for ${daysToBorrow} day(s)`
+            }],
+            { session }
+        );
+
+        const returnDate = new Date();
+        returnDate.setDate(returnDate.getDate() + daysToBorrow);
+
+        const borrowedBook = await BorrowedBook.create(
+            [{
+                user: userId,
+                book: book._id,
+                borrowed_date: new Date(),
+                return_date: returnDate
+            }],
+            { session }
+        );
+
+        await session.commitTransaction();
+        session.endSession();
+
+        res.status(201).json({
+            message: "Book borrowed successfully",
+            transaction: transaction[0],
+            borrowedBook: borrowedBook[0]
         });
 
-        res.status(201).json({ message: 'Book borrowed successfully', transaction });
     } catch (err) {
+        await session.abortTransaction();
+        session.endSession();
         next(err);
     }
 });
+
 const buyBook = asyncHandler(async (req, res) => {
     const userId = req.user._id;
     const bookId = req.params.id;
@@ -217,14 +258,28 @@ const uploadBookPDF = asyncHandler(async (req, res) => {
 // @access  Private
 const getBookPDF = asyncHandler(async (req, res) => {
     const book = await Book.findById(req.params.id);
-    if (!book || !book.pdf_path) return res.status(404).json({ message: 'PDF as not found' });
-
-    const hasAccess = await OwnedBook.findOne({ user: req.user._id, book: book._id });
-    if (!hasAccess) {
-        return res.status(403).json({ message: 'Access denied' });
+    if (!book || !book.pdf_path) {
+        return res.status(404).json({ message: 'PDF not found' });
     }
 
-    res.json({ pdf_url: book.pdf_path });
+    // Check ownership
+    const owned = await OwnedBook.findOne({ user: req.user._id, book: book._id });
+    if (owned) {
+        return res.json({ pdf_url: book.pdf_path });
+    }
+
+    // Check borrowing
+    const borrowed = await BorrowedBook.findOne({ user: req.user._id, book: book._id });
+    if (borrowed) {
+        if (borrowed.return_date >= new Date()) {
+            // still valid
+            return res.json({ pdf_url: book.pdf_path });
+        } else {
+            return res.status(403).json({ message: 'Your borrow period has expired' });
+        }
+    }
+
+    return res.status(403).json({ message: 'Access denied' });
 });
 
 
@@ -233,6 +288,16 @@ const previewPDF = asyncHandler(async (req, res) => {
     const book = await Book.findById(req.params.id);
     if (!book || !book.pdf_path) {
         return res.status(404).json({ message: 'PDF not found' });
+    }
+
+    // Check ownership
+    const owned = await OwnedBook.findOne({ user: req.user._id, book: book._id });
+    if (!owned) {
+        // Not owned -> check borrowing
+        const borrowed = await BorrowedBook.findOne({ user: req.user._id, book: book._id });
+        if (!borrowed || borrowed.return_date < new Date()) {
+            return res.status(403).json({ message: borrowed ? 'Your borrow period has expired' : 'Access denied' });
+        }
     }
 
     const filePath = path.join(__dirname, '..', 'uploads', book.pdf_path.replace('/pdfs/', 'pdfs/'));
