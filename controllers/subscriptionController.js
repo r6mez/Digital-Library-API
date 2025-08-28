@@ -4,8 +4,8 @@ const asyncHandler = require('../utils/asyncHandler');
 
  
 // get all subscriptions
-const getSubscriptions = asyncHandler(async (req, res, next) => {
-  const subscriptions = await Subscription.find({ user: req.user._id });
+const getSubscriptions = asyncHandler(async (req, res) => {
+  const subscriptions = await Subscription.find({ user: req.user });
   res.status(200).json({
     success: true,
     data: subscriptions
@@ -16,7 +16,6 @@ const getSubscriptions = asyncHandler(async (req, res, next) => {
 const createSubscription = asyncHandler(async (req, res, next) => {
   const { name, maximum_borrow, price, duration_in_days } = req.body;
   const subscription = await Subscription.create({
-    user: req.user._id,
     name,
     maximum_borrow,
     price,
@@ -49,7 +48,7 @@ const updateSubscription = asyncHandler(async (req, res, next) => {
 });
 
 // delete a subscription
-const deleteSubscription = asyncHandler(async (req, res, next) => {
+const deleteSubscription = asyncHandler(async (req, res) => {
   const subscription = await Subscription.findByIdAndDelete(req.params.id);
   if (!subscription) {
     res.status(404).json({
@@ -63,8 +62,8 @@ const deleteSubscription = asyncHandler(async (req, res, next) => {
   });
 });
 
-// activate a subscription free and add it to activeSubscriptionsModel
-const activateSubscription = asyncHandler(async (req, res, next) => {
+// activate a subscription 
+const activateSubscription = asyncHandler(async (req, res) => {
     const { subscription_id, start_date, deadline } = req.body;
     const subscription = await Subscription.findById(subscription_id);
     if (!subscription) {
@@ -74,8 +73,8 @@ const activateSubscription = asyncHandler(async (req, res, next) => {
     });
     }
     const activeSubscription = await activeSubscriptionsModel.create({
-        subscription_id,
-        user_id: req.user._id,
+        subscription: subscription._id,
+        user: req.user,
         start_date,
         deadline,
         remaining_borrows: subscription.maximum_borrow
