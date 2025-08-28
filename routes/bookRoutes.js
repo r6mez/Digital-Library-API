@@ -37,15 +37,5 @@ router.get('/:id/preview', protect, previewPDF);
 
 
 
-// router.post('/test', upload.single('pdf'), (req, res) => {
-    
-//     console.log("Cloudinary ENV:", {
-//         cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-//         api_key: process.env.CLOUDINARY_API_KEY,
-//         api_secret: process.env.CLOUDINARY_API_SECRET ? "Loaded" : "Missing"
-//     });
-//     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-//     res.json({ file: req.file });
-// });
 
 module.exports = router;

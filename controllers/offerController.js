@@ -34,7 +34,7 @@ const createOffer = asyncHandler(async (req, res) => {
         user: user._id,
         original_price: total_price,
         discounted_price: new_price,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // valid for 24 hours
     })
 
     const offeredBooksObj = books.map(book => ({
