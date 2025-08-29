@@ -6,7 +6,7 @@ A feature-rich backend API for an online library, built with Node.js, Express, a
 ### ✅ Prerequisites
 - Node.js (v18.x or later)
 - npm 
-- MongoDB (local instance or MongoDB Atlas)
+- MongoDB (local instance configured as a replica set or MongoDB Atlas)
 
 ### 🔑 Environment Variables
 

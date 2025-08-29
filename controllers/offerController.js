@@ -4,6 +4,7 @@ const OfferedBook = require("../models/offeredBook");
 const OwendBook = require("../models/owendBookModel");
 const User = require("../models/userModel");
 const Transaction = require("../models/transactionModel");
+const { sendOfferPurchaseEmail } = require("../utils/emailService");
 const asyncHandler = require("../utils/asyncHandler");
 
 const createOffer = asyncHandler(async (req, res) => {
@@ -114,6 +115,23 @@ const acceptOffer = asyncHandler(async (req, res) => {
         type: 'PURCHASE_OFFER',
         description: `Purchase of offer ${offerId}`
     });
+
+    // Send confirmation email
+    try {
+        const bookNames = offeredBooks.map(ob => ob.book.name);
+        const offerDetails = `Special Offer (${offeredBooks.length} books)`;
+        
+        await sendOfferPurchaseEmail(
+            user.email,
+            user.name,
+            offerDetails,
+            bookNames,
+            price
+        );
+    } catch (emailError) {
+        console.error('Failed to send offer purchase email:', emailError);
+        // Don't fail the transaction if email fails
+    }
 
     res.status(200).json({ message: 'Offer purchased successfully', owned, transaction });
 });

@@ -3,8 +3,11 @@ const Book = require('../models/bookModel');
 const asyncHandler = require('../utils/asyncHandler');
 const User = require('../models/userModel');
 const OwnedBook = require('../models/owendBookModel');
-const borrowedBook = require('../models/borrowedBookModel');
+const BorrowedBook = require('../models/borrowedBookModel');
 const Transaction = require('../models/transactionModel');
+const ActiveSubscription = require('../models/activeSubscribtionModel');
+const Subscription = require('../models/subscriptionModel');
+const { sendBookBorrowEmail, sendBookPurchaseEmail } = require('../utils/emailService');
 const path = require('path');
 const fs = require('fs');  
 
@@ -15,15 +18,18 @@ const getBooks = asyncHandler(async (req, res, next) => {
         // Create filter object
         const filter = {};
 
-        if (name) filter.name = { $regex: name, $options: 'i' }; //  $regex tell mongo to get the word in any order e.g for Zeyad( Zeyad Zahran , Zahran Zeyad) both are the same  and i means the filter will be Case Insensitive
+        //  $regex tell mongo to get the word in any order e.g for Zeyad( Zeyad Zahran , Zahran Zeyad) 
+        // both are the same  and i means the filter will be Case Insensitive
+        if (name) filter.name = { $regex: name, $options: 'i' }; 
         if (type) filter.type = type;
         if (category) filter.category = category;
 
         // Find books with filters and pagination
         const books = await Book.find(filter)
+            .populate('author', 'name')
             .populate('category', 'name')
             .populate('type', 'name')
-            .skip((page - 1) * limit) // here we skip the res form prev pages 
+            .skip((page - 1) * limit) 
             .limit(Number(limit));
 
         const total = await Book.countDocuments(filter);
@@ -38,6 +44,7 @@ const getBooks = asyncHandler(async (req, res, next) => {
 const getBookById = asyncHandler(async (req, res, next) => {
     try {
         const book = await Book.findById(req.params.id)
+            .populate('author', 'name')
             .populate('category', 'name')
             .populate('type', 'name');
 
@@ -85,7 +92,7 @@ const borrowBook = asyncHandler(async (req, res, next) => {
 
     try {
         const { days } = req.body;
-        const daysToBorrow = days && days > 0 ? days : 1;
+        const daysToBorrow = days;
 
         const book = await Book.findById(req.params.id).session(session);
         if (!book) {
@@ -143,7 +150,7 @@ const borrowBook = asyncHandler(async (req, res, next) => {
                 book: book._id,
                 type: "BORROW",
                 amount: amountToPay,
-                description: `Borrowed ${book.title} for ${daysToBorrow} day(s)`
+                description: `Borrowed ${book.name} for ${daysToBorrow} day(s)`
             }],
             { session }
         );
@@ -163,6 +170,21 @@ const borrowBook = asyncHandler(async (req, res, next) => {
 
         await session.commitTransaction();
         session.endSession();
+
+        // Send confirmation email
+        try {
+            const user = await User.findById(userId);
+            await sendBookBorrowEmail(
+                user.email,
+                user.name,
+                book.name,
+                daysToBorrow,
+                amountToPay,
+                returnDate
+            );
+        } catch (emailError) {
+            console.error('Failed to send borrow email:', emailError);
+        }
 
         res.status(201).json({
             message: "Book borrowed successfully",
@@ -221,7 +243,22 @@ const buyBook = asyncHandler(async (req, res) => {
             description: `Purchase of book ${book._id}`
         }], { session });
 
+
+        // 6. Commit the transaction
         await session.commitTransaction();
+
+        try {
+            const user = await User.findById(userId);
+            await sendBookPurchaseEmail(
+                user.email,
+                user.name,
+                book.name,
+                book.buy_price
+            );
+        } catch (emailError) {
+            console.error('Failed to send purchase email:', emailError);
+        }
+
         res.json({ message: 'Book purchased successfully', owned });
     } catch (err) {
         await session.abortTransaction();
@@ -231,9 +268,7 @@ const buyBook = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc    Upload PDF for a Book (Admin)
-// @route   POST /api/books/:id/pdf
-// @access  Private/Admin
+
 const uploadBookPDF = asyncHandler(async (req, res) => {
     const book = await Book.findById(req.params.id);
     if (!book) return res.status(404).json({ message: 'Book not found' });
@@ -253,9 +288,6 @@ const uploadBookPDF = asyncHandler(async (req, res) => {
 });
 
 
-// @desc    Get PDF URL (User must own the book)
-// @route   GET /api/books/:id/pdf
-// @access  Private
 const getBookPDF = asyncHandler(async (req, res) => {
     const book = await Book.findById(req.params.id);
     if (!book || !book.pdf_path) {
@@ -272,7 +304,6 @@ const getBookPDF = asyncHandler(async (req, res) => {
     const borrowed = await BorrowedBook.findOne({ user: req.user._id, book: book._id });
     if (borrowed) {
         if (borrowed.return_date >= new Date()) {
-            // still valid
             return res.json({ pdf_url: book.pdf_path });
         } else {
             return res.status(403).json({ message: 'Your borrow period has expired' });

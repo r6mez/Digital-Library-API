@@ -1,6 +1,10 @@
 const Subscription = require('../models/subscriptionModel');
 const activeSubscriptionsModel = require('../models/activeSubscribtionModel');
+const Transaction = require('../models/transactionModel');
+const User = require('../models/userModel');
 const asyncHandler = require('../utils/asyncHandler');
+const { sendSubscriptionActivationEmail } = require('../utils/emailService');
+const mongoose = require('mongoose');
 
  
 // get all subscriptions
@@ -64,25 +68,104 @@ const deleteSubscription = asyncHandler(async (req, res) => {
 
 // activate a subscription 
 const activateSubscription = asyncHandler(async (req, res) => {
-    const { subscription_id, start_date, deadline } = req.body;
-    const subscription = await Subscription.findById(subscription_id);
-    if (!subscription) {
-      res.status(404).json({
-      success: false,
-      message: 'Subscription not found'
-    });
+    const { subscription_id } = req.body;
+    const userId = req.user._id;
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        // Find the subscription
+        const subscription = await Subscription.findById(subscription_id).session(session);
+        if (!subscription) {
+            await session.abortTransaction();
+            return res.status(404).json({
+                success: false,
+                message: 'Subscription not found'
+            });
+        }
+
+        // Check if user already has an active subscription
+        const existingActive = await activeSubscriptionsModel.findOne({ user: userId }).session(session);
+        if (existingActive) {
+            await session.abortTransaction();
+            return res.status(400).json({
+                success: false,
+                message: 'You already have an active subscription'
+            });
+        }
+
+        // Get user details and check balance
+        const user = await User.findById(userId).session(session);
+        if (user.money < subscription.price) {
+            await session.abortTransaction();
+            return res.status(400).json({
+                success: false,
+                message: 'Insufficient funds'
+            });
+        }
+
+        // Deduct money from user account
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $inc: { money: -subscription.price } },
+            { new: true, session }
+        );
+
+        // Calculate expiry date
+        const startDate = new Date();
+        const expiryDate = new Date(startDate.getTime() + (subscription.duration_in_days * 24 * 60 * 60 * 1000));
+
+        // Create active subscription
+        const activeSubscription = await activeSubscriptionsModel.create([{
+            subscription: subscription._id,
+            user: userId,
+            start_date: startDate,
+            deadline: expiryDate,
+            remaining_borrows: subscription.maximum_borrow
+        }], { session });
+
+        // Create transaction record
+        const transaction = await Transaction.create([{
+            user: userId,
+            amount: subscription.price,
+            type: 'SUBSCRIPTION',
+            description: `Subscription purchase: ${subscription.name}`
+        }], { session });
+
+        await session.commitTransaction();
+
+        // Send confirmation email
+        try {
+            await sendSubscriptionActivationEmail(
+                user.email,
+                user.name,
+                subscription.name,
+                subscription.price,
+                subscription.duration_in_days,
+                subscription.maximum_borrow,
+                expiryDate
+            );
+        } catch (emailError) {
+            console.error('Failed to send subscription email:', emailError);
+            // Don't fail the transaction if email fails
+        }
+
+        res.status(201).json({
+            success: true,
+            data: {
+                activeSubscription: activeSubscription[0],
+                transaction: transaction[0],
+                remainingBalance: updatedUser.money
+            }
+        });
+
+    } catch (error) {
+        await session.abortTransaction();
+        throw error;
+    } finally {
+        session.endSession();
     }
-    const activeSubscription = await activeSubscriptionsModel.create({
-        subscription: subscription._id,
-        user: req.user,
-        start_date,
-        deadline,
-        remaining_borrows: subscription.maximum_borrow
-    });
-    res.status(201).json({
-        success: true,
-        data: activeSubscription
-    });
 });
 
 const deactivateSubscription = asyncHandler(async (req, res, next) => {

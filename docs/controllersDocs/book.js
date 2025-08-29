@@ -304,7 +304,7 @@
 
 /**
  * @swagger
- * /api/books/{id}/pdf:
+ * /books/{id}/pdf:
  *   post:
  *     summary: Upload PDF for a specific book
  *     description: Allows an admin to upload a PDF file for a specific book. Requires admin privileges.
@@ -342,7 +342,7 @@
  *                   example: PDF uploaded successfully
  *                 pdf_url:
  *                   type: string
- *                   example: https://res.cloudinary.com/demo/book.pdf
+ *                   example: /pdfs/1756159783124.pdf
  *       400:
  *         description: Bad Request (Invalid file or missing PDF)
  *       401:
@@ -356,10 +356,10 @@
 
 /**
  * @swagger
- * /api/books/{id}/pdf:
+ * /books/{id}/pdf:
  *   get:
  *     summary: Get PDF URL for a specific book
- *     description: Returns the PDF URL if the user has access (owns the book or it's free).
+ *     description: Returns the PDF URL if the user has access (owns the book or has an active borrow).
  *     tags: [Books]
  *     security:
  *       - bearerAuth: []
@@ -380,11 +380,53 @@
  *               properties:
  *                 pdf_url:
  *                   type: string
- *                   example: https://res.cloudinary.com/demo/book.pdf
+ *                   example: /pdfs/1756159783124.pdf
  *       401:
  *         description: Unauthorized (No token provided)
  *       403:
- *         description: Forbidden (User doesn't own book and it's not free)
+ *         description: Forbidden (User doesn't own book or borrow period has expired)
  *       404:
  *         description: Book or PDF not found
+ */
+
+
+/**
+ * @swagger
+ * /books/{id}/preview:
+ *   get:
+ *     summary: Stream PDF content for a specific book
+ *     description: Streams the PDF file content directly if the user has access (owns the book or has an active borrow). Returns the PDF file for inline viewing.
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the book to preview the PDF for.
+ *     responses:
+ *       200:
+ *         description: PDF file content streamed successfully
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *         headers:
+ *           Content-Type:
+ *             schema:
+ *               type: string
+ *               example: application/pdf
+ *           Content-Disposition:
+ *             schema:
+ *               type: string
+ *               example: inline
+ *       401:
+ *         description: Unauthorized (No token provided)
+ *       403:
+ *         description: Forbidden (User doesn't own book or borrow period has expired)
+ *       404:
+ *         description: Book, PDF not found, or file not found on server
  */
