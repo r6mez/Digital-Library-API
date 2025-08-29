@@ -15,6 +15,18 @@
  *           type: number
  *         admin:
  *           type: boolean
+ *         isEmailVerified:
+ *           type: boolean
+ *         emailVerificationToken:
+ *           type: string
+ *         emailVerificationTokenExpires:
+ *           type: string
+ *           format: date-time
+ *         passwordResetToken:
+ *           type: string
+ *         passwordResetTokenExpires:
+ *           type: string
+ *           format: date-time
  *     RegisterRequest:
  *       type: object
  *       required:

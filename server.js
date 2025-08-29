@@ -9,8 +9,6 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const offerRoutes = require('./routes/offerRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
-
-
 const { swaggerUi, swaggerSpec } = require("./config/swagger");
 
 // Load environment variables
@@ -23,6 +21,9 @@ const app = express();
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+
+// Root route
+app.get('/', (req, res) => { res.send('API is running...'); });
 
 // Swagger Route
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -38,10 +39,5 @@ app.use('/subscriptions', subscriptionRoutes);
 app.use('/transactions', transactionRoutes);
 
 
-app.get('/', (req, res) => {
-  res.send('API is running...');
-});
-
 const PORT = process.env.PORT || 5001;
-
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

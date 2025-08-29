@@ -93,4 +93,60 @@
  *                       $ref: '#/components/schemas/Book'
  *       401:
  *         description: Unauthorized
+ * 
+ * /users/me/update-profile:
+ *   put:
+ *     summary: Update authenticated user's profile
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             minProperties: 1
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 minLength: 3
+ *                 description: Updated name
+ *               password:
+ *                 type: string
+ *                 minLength: 6
+ *                 description: New password
+ *               currentPassword:
+ *                 type: string
+ *                 description: Current password (required when updating password)
+ *             example:
+ *               name: "Updated Name"
+ *               password: "newPassword123"
+ *               currentPassword: "currentPassword123"
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 _id:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 isEmailVerified:
+ *                   type: boolean
+ *       400:
+ *         description: Bad request (validation failed or incorrect current password)
+ *       401:
+ *         description: Unauthorized (invalid token)
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
  */
