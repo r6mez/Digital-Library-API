@@ -23,6 +23,7 @@ const options = {
       { name: 'Users', description: 'User management and profile' },
       { name: 'Types', description: 'Book types management' },
       { name: 'Categories', description: 'Book categories management' },
+      { name: 'Authors', description: 'Authors management' },
       { name: 'Books', description: 'Book endpoints' },
       { name: 'Offers', description: 'Offers endpoints' }
     ],

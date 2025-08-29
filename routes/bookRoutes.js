@@ -17,15 +17,14 @@ const validate = require('../validators/validate');
 const { protect } = require('../middleware/authMiddleware');
 const { admin } = require('../middleware/adminMiddleware');
 const upload = require('../middleware/upload');
-const { bookSchema } = require('../validators/bookValidator');
+const { bookSchema, borrowBookSchema } = require('../validators/bookValidator');
 
 
 router.get('/', getBooks);
 router.get('/:id', getBookById);
 
 router.post('/:id/buy', protect, buyBook);
-// borrow book
-router.post('/:id/borrow', protect, borrowBook);
+router.post('/:id/borrow', protect, validate(borrowBookSchema), borrowBook);
 
 router.post('/', protect, admin, validate(bookSchema), createBook);
 router.put('/:id', protect, admin, validate(bookSchema), updateBook);

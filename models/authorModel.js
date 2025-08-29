@@ -13,7 +13,7 @@ const authorSchema = new mongoose.Schema({
         type: String,
         required: true
     }
-});
+}, { timestamps: true });
 
 const Author = mongoose.model('Author', authorSchema);
 
