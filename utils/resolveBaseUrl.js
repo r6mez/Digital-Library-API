@@ -5,3 +5,4 @@ const resolveBaseUrl = () => {
     const port = process.env.PORT || 5001;
     return `http://localhost:${port}`;
 };
+module.exports = resolveBaseUrl;

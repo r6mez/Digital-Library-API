@@ -1,9 +1,7 @@
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 const path = require('path');
-const resolveBaseUrl = require('./utils/resolveBaseUrl');
-
-
+const resolveBaseUrl = require('../utils/resolveBaseUrl');
 
 const options = {
   definition: {

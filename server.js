@@ -1,6 +1,5 @@
-dotenv.config();
+require('dotenv').config();
 const express = require('express');
-const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -11,12 +10,10 @@ const authorRoutes = require('./routes/authorRoutes');
 const offerRoutes = require('./routes/offerRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
-const resolveBaseUrl = require('./utils/resolveBaseUrl');
 const { swaggerUi, swaggerSpec } = require("./config/swagger");
 
 const app = express();
-const baseURL = resolveBaseUrl();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5001;
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -24,7 +21,7 @@ app.use(express.json());
 // Root route
 app.get('/', (req, res) => { res.send('API is running...'); });
 
-app.use(`${baseURL}/api-docs`, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // API Routes
 app.use('/auth', authRoutes);
