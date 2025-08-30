@@ -14,7 +14,7 @@ const bookSchema = Joi.object({
 });
 
 const borrowBookSchema = Joi.object({
-    days: Joi.number().integer().min(1).required()
+    days: Joi.number().integer().min(1).max(30).required()
 });
 
 module.exports = { bookSchema, borrowBookSchema };

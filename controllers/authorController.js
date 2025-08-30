@@ -78,8 +78,7 @@ const updateAuthor = asyncHandler(async (req, res) => {
 const deleteAuthor = asyncHandler(async (req, res) => {
   const author = await Author.findById(req.params.id);
   if (!author) return res.status(404).json({ message: 'Author not found' });
-  
-  await author.remove();
+  await author.deleteOne();
   res.json({ message: 'Author removed' });
 });
 

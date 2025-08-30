@@ -253,6 +253,59 @@
      *         description: Server error
      */
 
+    /**
+     * @swagger
+     * /books/{id}/return:
+     *   post:
+     *     summary: Return a borrowed book
+     *     tags: [Books]
+     *     security:
+     *       - bearerAuth: []
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         schema:
+     *           type: string
+     *         description: ID of the book to return
+     *     responses:
+     *       200:
+     *         description: Book returned successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: Book returned successfully
+     *                 returnedBook:
+     *                   type: object
+     *                   properties:
+     *                     bookId:
+     *                       type: string
+     *                       description: ID of the returned book
+     *                     bookName:
+     *                       type: string
+     *                       description: Name of the returned book
+     *                     borrowedDate:
+     *                       type: string
+     *                       format: date-time
+     *                       description: Date when the book was borrowed
+     *                     returnedDate:
+     *                       type: string
+     *                       format: date-time
+     *                       description: Date when the book was returned
+     *       400:
+     *         description: Bad request (book not borrowed by user)
+     *       401:
+     *         description: Unauthorized (missing or invalid token)
+     *       404:
+     *         description: Book not found
+     *       500:
+     *         description: Server error
+     */
+
     
     /**
      * @swagger
@@ -292,7 +345,7 @@
      *                       type: string
      *                       format: date-time
      *       400:
-     *         description: Bad request (insufficient funds or already owned)
+     *         description: Bad request (insufficient funds, already owned, or already borrowed)
      *       401:
      *         description: Unauthorized (missing or invalid token)
      *       404:

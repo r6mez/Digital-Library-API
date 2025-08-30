@@ -4,24 +4,32 @@ const asyncHandler = require('../utils/asyncHandler');
 const { updateProfileSchema } = require('../validators/authValidator');
 const ActiveSubscription = require('../models/activeSubscribtionModel');
 const OwnedBooks = require('../models/owendBookModel');
+const BorrowedBook = require('../models/borrowedBookModel');
 const Offer = require('../models/offerModel');
 const OfferedBook = require('../models/offeredBook');
-const transaction = require('../models/transactionModel');
+const Transaction = require('../models/TransactionModel');
 
 const getSignedUser = asyncHandler(async (req, res) => {
   res.status(200).json(req.user);
 });
 
-// Returns the active subscription for the signed-in user (or null)
+// Returns the latest active subscription for the signed-in user (or null)
 const getUserSubscription = asyncHandler(async (req, res) => {
-  const active = await ActiveSubscription.findOne({ user: req.user._id }).populate('subscription');
+  const active = await ActiveSubscription.findLatestActive(req.user._id);
   if (!active) return res.status(404).json({ message: 'No active subscription found' });
   res.status(200).json(active);
 });
 
+// Returns all subscription history for the signed-in user
+const getUserSubscriptionHistory = asyncHandler(async (req, res) => {
+  const history = await ActiveSubscription.findUserHistory(req.user._id);
+  if (!history || history.length === 0) return res.status(404).json({ message: 'No subscription history found' });
+  res.status(200).json(history);
+});
+
 // Returns transaction history for the signed-in user (most recent first)
 const getUserTransactions = asyncHandler(async (req, res) => {
-  const transactions = await transaction.find({ user: req.user._id }).sort({ createdAt: -1 });
+  const transactions = await Transaction.find({ user: req.user._id }).sort({ createdAt: -1 });
   if (transactions.length === 0) {
     return res.status(404).json({ message: 'No transactions found' });
   }
@@ -35,6 +43,29 @@ const getOwnedBooks = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: 'No owned books found' });
   }
   res.status(200).json(books);
+});
+
+// Returns all currently borrowed books for the signed-in user (most recent first)
+const getBorrowedBooks = asyncHandler(async (req, res) => {
+  const borrowedBooks = await BorrowedBook.find({ user: req.user._id })
+    .sort({ createdAt: -1 })
+    .populate("book", "name author cover_image_url publication_date category type");
+  
+  if (borrowedBooks.length === 0) {
+    return res.status(404).json({ message: 'No borrowed books found' });
+  }
+
+  // Add status to each borrowed book (active or expired)
+  const borrowedBooksWithStatus = borrowedBooks.map(borrowedBook => {
+    const isExpired = borrowedBook.return_date < new Date();
+    return {
+      ...borrowedBook.toObject(),
+      status: isExpired ? 'expired' : 'active',
+      daysRemaining: isExpired ? 0 : Math.ceil((borrowedBook.return_date - new Date()) / (1000 * 60 * 60 * 24))
+    };
+  });
+
+  res.status(200).json(borrowedBooksWithStatus);
 });
 
 // Returns all offers created/assigned to the signed-in user (with included books)
@@ -100,4 +131,4 @@ const updateProfile = async (req, res) => {
   }
 };
 
-module.exports = { getSignedUser, getUserSubscription, getUserTransactions, getOwnedBooks, getUserOffers, updateProfile };
+module.exports = { getSignedUser, getUserSubscription, getUserSubscriptionHistory, getUserTransactions, getOwnedBooks, getBorrowedBooks, getUserOffers, updateProfile };

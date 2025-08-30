@@ -16,6 +16,13 @@ const protect = async (req, res, next) => {
       // We exclude the password field
       req.user = await User.findById(decoded.id).select('-password');
 
+      // Check if user still exists in database
+      if (!req.user) {
+        return res.status(401).json({ 
+          message: 'Not authorized, user no longer exists' 
+        });
+      }
+
       next(); // Proceed to the next middleware/controller
     } catch (error) {
       console.error(error);
@@ -24,7 +31,7 @@ const protect = async (req, res, next) => {
   }
 
   if (!token) {
-    res.status(401).json({ message: 'Not authorized, no token' });
+    return res.status(401).json({ message: 'Not authorized, no token' });
   }
 };
 

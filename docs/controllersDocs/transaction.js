@@ -1,9 +1,73 @@
 /**
  * @swagger
  * /transactions:
+ *   get:
+ *     summary: Get all transactions (Admin Only)
+ *     description: Retrieve all transactions with pagination and filtering options. Admin access required.
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of transactions per page
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *           enum: [borrow, return]
+ *         description: Filter by transaction type
+ *       - in: query
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         description: Filter by user ID
+ *     responses:
+ *       200:
+ *         description: Transactions retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     transactions:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Transaction'
+ *                     pagination:
+ *                       type: object
+ *                       properties:
+ *                         page:
+ *                           type: integer
+ *                         limit:
+ *                           type: integer
+ *                         total:
+ *                           type: integer
+ *                         pages:
+ *                           type: integer
+ */
+
+/**
+ * @swagger
+ * /transactions:
  *   post:
- *     summary: Create a new transaction
- *     description: Create a new transaction for the authenticated user
+ *     summary: Create a new transaction (Admin Only)
+ *     description: Create a new transaction. Admin access required.
  *     tags: [Transactions]
  *     security:
  *       - bearerAuth: []
@@ -48,8 +112,8 @@
  * @swagger
  * /transactions/{id}:
  *   get:
- *     summary: Get a transaction by ID
- *     description: Retrieve a transaction by its ID
+ *     summary: Get a transaction by ID (Admin Only)
+ *     description: Retrieve a transaction by its ID. Admin access required.
  *     tags: [Transactions]
  *     security:
  *       - bearerAuth: []
@@ -93,8 +157,8 @@
  * @swagger
  * /transactions/{id}:
  *   put:
- *     summary: Update a transaction
- *     description: Update an existing transaction for the authenticated user
+ *     summary: Update a transaction (Admin Only)
+ *     description: Update an existing transaction. Admin access required.
  *     tags: [Transactions]
  *     security:
  *       - bearerAuth: []
@@ -159,8 +223,8 @@
  * @swagger
  * /transactions/{id}:
  *   delete:
- *     summary: Delete a transaction
- *     description: Delete an existing transaction for the authenticated user
+ *     summary: Delete a transaction (Admin Only)
+ *     description: Delete an existing transaction. Admin access required.
  *     tags: [Transactions]
  *     security:
  *       - bearerAuth: []

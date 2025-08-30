@@ -4,7 +4,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const User = require('../models/userModel');
 const OwnedBook = require('../models/owendBookModel');
 const BorrowedBook = require('../models/borrowedBookModel');
-const Transaction = require('../models/transactionModel');
+const Transaction = require('../models/TransactionModel');
 const ActiveSubscription = require('../models/activeSubscribtionModel');
 const Subscription = require('../models/subscriptionModel');
 const { sendBookBorrowEmail, sendBookPurchaseEmail } = require('../utils/emailService');
@@ -102,25 +102,34 @@ const borrowBook = asyncHandler(async (req, res, next) => {
         }
 
         const userId = req.user._id;
+
+        // Check if user has already borrowed this book
+        const existingBorrow = await BorrowedBook.findOne({
+            user: userId,
+            book: book._id
+        }).session(session);
+
+        if (existingBorrow) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({ message: "You have already borrowed this book" });
+        }
+
         let amountToPay = 0;
 
-        // --- Check subscription ---
-        const activeSubscription = await ActiveSubscription.findOne({ user: userId }).session(session);
+        const activeSubscription = await ActiveSubscription.findOne({
+            user: userId,
+            deadline: { $gt: new Date() }
+        }).sort({ createdAt: -1 }).session(session);
 
         if (activeSubscription) {
-            const subscription = await Subscription.findById(activeSubscription.subscription_id).session(session);
+            const subscription = await Subscription.findById(activeSubscription.subscription).session(session);
 
-            const now = new Date();
-            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-
-            const userTransactionsCount = await Transaction.countDocuments({
-                user: userId,
-                type: "BORROW",
-                createdAt: { $gte: startOfMonth, $lte: endOfMonth }
+            const currentBorrowedBooksCount = await BorrowedBook.countDocuments({
+                user: userId
             }).session(session);
 
-            if (userTransactionsCount >= subscription.maximum_borrow) {
+            if (currentBorrowedBooksCount >= subscription.maximum_borrow) {
                 // exceeded quota → must pay
                 amountToPay = book.borrow_price_per_day * daysToBorrow;
             }
@@ -221,7 +230,14 @@ const buyBook = asyncHandler(async (req, res) => {
             return res.status(400).json({ message: 'You already own this book' });
         }
 
-        // 3. Deduct money atomically
+        // 3. Check if user has already borrowed the book
+        const alreadyBorrowed = await BorrowedBook.findOne({ user: userId, book: book._id }).session(session);
+        if (alreadyBorrowed) {
+            await session.abortTransaction();
+            return res.status(400).json({ message: 'You have already borrowed this book. Return it first or wait for it to expire before purchasing.' });
+        }
+
+        // 4. Deduct money atomically
         const updatedUser = await User.findOneAndUpdate(
             { _id: userId, money: { $gte: book.buy_price } }, 
             { $inc: { money: -book.buy_price } },           
@@ -232,10 +248,10 @@ const buyBook = asyncHandler(async (req, res) => {
             return res.status(400).json({ message: 'Insufficient funds' });
         }
 
-        // 4. Create ownership record
+        // 5. Create ownership record
         const owned = await OwnedBook.create([{ user: userId, book: book._id }], { session });
 
-        // 5. Create transaction record
+        // 6. Create transaction record
         await Transaction.create([{
             user: userId,
             amount: book.buy_price,
@@ -244,7 +260,7 @@ const buyBook = asyncHandler(async (req, res) => {
         }], { session });
 
 
-        // 6. Commit the transaction
+        // 7. Commit the transaction
         await session.commitTransaction();
 
         try {
@@ -342,6 +358,45 @@ const previewPDF = asyncHandler(async (req, res) => {
     fs.createReadStream(filePath).pipe(res);
 });
 
+const returnBook = asyncHandler(async (req, res, next) => {
+    try {
+        const bookId = req.params.id;
+        const userId = req.user._id;
+
+        // Find the book to ensure it exists
+        const book = await Book.findById(bookId);
+        if (!book) {
+            return res.status(404).json({ message: 'Book not found' });
+        }
+
+        // Find the borrowed book record
+        const borrowedBook = await BorrowedBook.findOne({
+            user: userId,
+            book: bookId
+        });
+
+        if (!borrowedBook) {
+            return res.status(400).json({ message: 'You have not borrowed this book' });
+        }
+
+        // Remove the borrowed book record
+        await BorrowedBook.findByIdAndDelete(borrowedBook._id);
+
+        res.json({ 
+            message: 'Book returned successfully',
+            returnedBook: {
+                bookId: book._id,
+                bookName: book.name,
+                borrowedDate: borrowedBook.borrowed_date,
+                returnedDate: new Date()
+            }
+        });
+
+    } catch (err) {
+        next(err);
+    }
+});
+
 
 
 module.exports = { getBooks,
@@ -353,5 +408,6 @@ module.exports = { getBooks,
        buyBook,
        uploadBookPDF,
        getBookPDF,
-    previewPDF
+    previewPDF,
+    returnBook
     };

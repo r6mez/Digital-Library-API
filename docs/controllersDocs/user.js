@@ -22,13 +22,39 @@
  *
  * /users/me/subscription:
  *   get:
- *     summary: Get the active subscription for the signed-in user
+ *     summary: Get the latest active subscription for the signed-in user
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Active subscription or null
+ *         description: Latest active subscription details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ActiveSubscription'
+ *       404:
+ *         description: No active subscription found
+ *       401:
+ *         description: Unauthorized
+ *
+ * /users/me/subscription-history:
+ *   get:
+ *     summary: Get complete subscription history for the signed-in user
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Complete subscription history (most recent first)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ActiveSubscription'
+ *       404:
+ *         description: No subscription history found
  *       401:
  *         description: Unauthorized
  *
@@ -66,6 +92,66 @@
  *                     type: string
  *                   book:
  *                     $ref: '#/components/schemas/Book'
+ *       401:
+ *         description: Unauthorized
+ * 
+ * /users/me/borrowed-books:
+ *   get:
+ *     summary: Get currently borrowed books for the signed-in user
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Array of borrowed books with status and remaining time
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     description: Borrowed book record ID
+ *                   user:
+ *                     type: string
+ *                     description: User ID
+ *                   book:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                       author:
+ *                         type: string
+ *                       cover_image_url:
+ *                         type: string
+ *                       publication_date:
+ *                         type: string
+ *                         format: date
+ *                       category:
+ *                         type: string
+ *                       type:
+ *                         type: string
+ *                   borrowed_date:
+ *                     type: string
+ *                     format: date-time
+ *                     description: Date when the book was borrowed
+ *                   return_date:
+ *                     type: string
+ *                     format: date-time
+ *                     description: Due date for returning the book
+ *                   status:
+ *                     type: string
+ *                     enum: [active, expired]
+ *                     description: Status of the borrowed book
+ *                   daysRemaining:
+ *                     type: integer
+ *                     description: Days remaining until return date (0 if expired)
+ *       404:
+ *         description: No borrowed books found
  *       401:
  *         description: Unauthorized
  * 

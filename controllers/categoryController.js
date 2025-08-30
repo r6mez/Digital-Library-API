@@ -32,7 +32,7 @@ const updateCategory = asyncHandler(async (req, res) => {
 const deleteCategory = asyncHandler(async (req, res) => {
   const cat = await Category.findById(req.params.id);
   if (!cat) return res.status(404).json({ message: 'Category not found' });
-  await cat.remove();
+  await cat.deleteOne();
   res.json({ message: 'Category removed' });
 });
 

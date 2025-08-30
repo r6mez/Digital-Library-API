@@ -37,7 +37,7 @@ const updateType = asyncHandler(async (req, res) => {
 const deleteType = asyncHandler(async (req, res) => {
   const type = await Type.findById(req.params.id);
   if (!type) return res.status(404).json({ message: 'Type not found' });
-  await type.remove();
+  await type.deleteOne();
   res.json({ message: 'Type removed' });
 });
 
