@@ -12,7 +12,6 @@ const createTransporter = () => {
   });
 };
 
-// Send email verification email
 const sendVerificationEmail = async (email, name, verificationToken) => {
   const transporter = createTransporter();
   

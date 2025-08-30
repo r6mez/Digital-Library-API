@@ -7,7 +7,7 @@ const { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, 
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '30d', // Token expires in 30 days
+    expiresIn: '30d', 
   });
 };
 
@@ -96,7 +96,6 @@ const loginUser = async (req, res) => {
   }
 };
 
-// Verify email
 const verifyEmail = async (req, res) => {
   try {
     const { error, value } = verifyEmailSchema.validate(req.body);
@@ -175,7 +174,6 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-// Reset password
 const resetPassword = async (req, res) => {
   try {
     const { error, value } = resetPasswordSchema.validate(req.body);
@@ -214,7 +212,6 @@ const resetPassword = async (req, res) => {
 
 
 
-// Resend verification email
 const resendVerificationEmail = async (req, res) => {
   try {
     const { email } = req.body;
