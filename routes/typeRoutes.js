@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-
 const validate = require('../validators/validate');
 const { nameSchema } = require('../validators/typeCategoryValidator');
 const { protect } = require('../middleware/authMiddleware');
