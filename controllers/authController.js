@@ -7,7 +7,7 @@ const { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, 
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '1h', // Token expires in 1 hour
+    expiresIn: '30d', // Token expires in 30 days
   });
 };
 
