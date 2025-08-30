@@ -1,5 +1,9 @@
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
+const path = require('path');
+const resolveBaseUrl = require('./utils/resolveBaseUrl');
+
+
 
 const options = {
   definition: {
@@ -29,12 +33,12 @@ const options = {
       { name: 'Offers', description: 'Offers endpoints' }
     ],
     servers: [
-      { url: "http://localhost:5001" },
+      { url: resolveBaseUrl() },
     ],
   },
   apis: [
-    "./docs/controllersDocs/*.js",
-    "./docs/modelsDocs/*.js",
+    path.join(__dirname, "../docs/controllersDocs/*.js"),
+    path.join(__dirname, "../docs/modelsDocs/*.js"),
   ],
 };
 

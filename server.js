@@ -1,3 +1,4 @@
+dotenv.config();
 const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
@@ -10,12 +11,12 @@ const authorRoutes = require('./routes/authorRoutes');
 const offerRoutes = require('./routes/offerRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
+const resolveBaseUrl = require('./utils/resolveBaseUrl');
 const { swaggerUi, swaggerSpec } = require("./config/swagger");
 
-// Load environment variables
-dotenv.config();
-
 const app = express();
+const baseURL = resolveBaseUrl();
+const PORT = process.env.PORT;
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -23,8 +24,7 @@ app.use(express.json());
 // Root route
 app.get('/', (req, res) => { res.send('API is running...'); });
 
-// Swagger Route
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(`${baseURL}/api-docs`, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // API Routes
 app.use('/auth', authRoutes);
@@ -36,9 +36,6 @@ app.use('/authors', authorRoutes);
 app.use('/offers', offerRoutes);
 app.use('/subscriptions', subscriptionRoutes);
 app.use('/transactions', transactionRoutes);
-
-
-const PORT = process.env.PORT || 5001;
 
 // Connect to database and start the server only after a successful connection
 connectDB()
