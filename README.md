@@ -10,20 +10,8 @@ A feature-rich backend API for an online library, built with Node.js, Express, a
 
 ### 🔑 Environment Variables
 
-To run this project, you will need to add the following environment variables to a .env file in the root directory.
+Create a `.env` file in the root directory with the varaibles in `.env.example` file and populate the variables with your database/email service credentials.
 
-Create a .env file and add the following:
-
-```env
-# MongoDB Connection String
-MONGO_URI=mongodb://127.0.0.1:27017/my-auth-app
-
-# JWT Secret Key
-JWT_SECRET=thisisareallystrongandsecretkey
-
-# Port Number
-PORT=5001
-```
 
 ### 🪖 Installation & Setup
 
@@ -153,3 +141,4 @@ Notes about expiry
 - [ ] offer
 - [ ] borrow logic 
 - [ ] subscription controller 
+

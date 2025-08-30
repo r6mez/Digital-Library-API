@@ -1,13 +1,12 @@
 const Subscription = require('../models/subscriptionModel');
 const activeSubscriptionsModel = require('../models/activeSubscribtionModel');
-const Transaction = require('../models/transactionModel');
+const Transaction = require('../models/TransactionModel');
 const User = require('../models/userModel');
 const asyncHandler = require('../utils/asyncHandler');
 const { sendSubscriptionActivationEmail } = require('../utils/emailService');
 const mongoose = require('mongoose');
 
  
-// get all subscriptions
 const getSubscriptions = asyncHandler(async (req, res) => {
   const subscriptions = await Subscription.find({ user: req.user });
   res.status(200).json({
@@ -16,7 +15,6 @@ const getSubscriptions = asyncHandler(async (req, res) => {
   });
 });
 
-// create a new subscription
 const createSubscription = asyncHandler(async (req, res, next) => {
   const { name, maximum_borrow, price, duration_in_days } = req.body;
   const subscription = await Subscription.create({
@@ -31,10 +29,10 @@ const createSubscription = asyncHandler(async (req, res, next) => {
   });
 });
 
-// update a subscription
 const updateSubscription = asyncHandler(async (req, res, next) => {
-  const { maximum_borrow, price, duration_in_days } = req.body;
+  const { name, maximum_borrow, price, duration_in_days } = req.body;
   const subscription = await Subscription.findByIdAndUpdate(req.params.id, {
+    name,
     maximum_borrow,
     price,
     duration_in_days
@@ -51,24 +49,21 @@ const updateSubscription = asyncHandler(async (req, res, next) => {
   });
 });
 
-// delete a subscription
 const deleteSubscription = asyncHandler(async (req, res) => {
   const subscription = await Subscription.findByIdAndDelete(req.params.id);
   if (!subscription) {
     res.status(404).json({
-      success: false,
       message: 'Subscription not found'
     });
   }
-  res.status(204).json({
-    success: true,
-    data: null
+  res.status(200).json({
+    message: "Subscription deleted successfully"
   });
 });
 
 // activate a subscription 
 const activateSubscription = asyncHandler(async (req, res) => {
-    const { subscription_id } = req.body;
+    const subscription_id = req.params.id; 
     const userId = req.user._id;
 
     const session = await mongoose.startSession();
@@ -85,13 +80,17 @@ const activateSubscription = asyncHandler(async (req, res) => {
             });
         }
 
-        // Check if user already has an active subscription
-        const existingActive = await activeSubscriptionsModel.findOne({ user: userId }).session(session);
+        // Check if user already has an active (non-expired) subscription
+        const existingActive = await activeSubscriptionsModel.findLatestActive(userId);
         if (existingActive) {
             await session.abortTransaction();
             return res.status(400).json({
                 success: false,
-                message: 'You already have an active subscription'
+                message: 'You already have an active subscription',
+                data: {
+                    currentSubscription: existingActive,
+                    expiresAt: existingActive.deadline
+                }
             });
         }
 
@@ -121,8 +120,7 @@ const activateSubscription = asyncHandler(async (req, res) => {
             subscription: subscription._id,
             user: userId,
             start_date: startDate,
-            deadline: expiryDate,
-            remaining_borrows: subscription.maximum_borrow
+            deadline: expiryDate
         }], { session });
 
         // Create transaction record
@@ -169,7 +167,7 @@ const activateSubscription = asyncHandler(async (req, res) => {
 });
 
 const deactivateSubscription = asyncHandler(async (req, res, next) => {
-  const { subscription_id } = req.body;
+  const subscription_id = req.params.id; // Get subscription ID from URL parameter
   const activeSubscription = await activeSubscriptionsModel.findByIdAndDelete(subscription_id);
   if (!activeSubscription) {
     res.status(404).json({
@@ -179,9 +177,36 @@ const deactivateSubscription = asyncHandler(async (req, res, next) => {
   }
   res.status(204).json({
     success: true,
-    data: null
+    message: 'Active subscription deleted successfully'
   });
 });
 
-module.exports = { getSubscriptions, createSubscription, updateSubscription, deleteSubscription, activateSubscription, deactivateSubscription };
+// Admin endpoint to get subscription statistics
+const getSubscriptionStatistics = asyncHandler(async (req, res) => {
+  const now = new Date();
+  const totalCount = await activeSubscriptionsModel.countDocuments({});
+  const activeCount = await activeSubscriptionsModel.countDocuments({ deadline: { $gt: now } });
+  const expiredCount = await activeSubscriptionsModel.countDocuments({ deadline: { $lte: now } });
+
+  const stats = {
+    total: totalCount,
+    active: activeCount,
+    expired: expiredCount
+  };
+
+  res.status(200).json({
+    success: true,
+    data: stats
+  });
+});
+
+module.exports = { 
+  getSubscriptions, 
+  createSubscription, 
+  updateSubscription, 
+  deleteSubscription, 
+  activateSubscription, 
+  deactivateSubscription,
+  getSubscriptionStatistics 
+};
 

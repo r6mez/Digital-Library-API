@@ -3,7 +3,7 @@ const Book = require("../models/bookModel");
 const OfferedBook = require("../models/offeredBook");
 const OwendBook = require("../models/owendBookModel");
 const User = require("../models/userModel");
-const Transaction = require("../models/transactionModel");
+const Transaction = require("../models/TransactionModel");
 const { sendOfferPurchaseEmail } = require("../utils/emailService");
 const asyncHandler = require("../utils/asyncHandler");
 

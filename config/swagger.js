@@ -25,6 +25,7 @@ const options = {
       { name: 'Categories', description: 'Book categories management' },
       { name: 'Authors', description: 'Authors management' },
       { name: 'Books', description: 'Book endpoints' },
+      { name: 'Subscriptions', description: 'Subscription management and activation' },
       { name: 'Offers', description: 'Offers endpoints' }
     ],
     servers: [
