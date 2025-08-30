@@ -5,9 +5,9 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "My API",
+      title: "Digital Library API",
       version: "1.0.0",
-      description: "API documentation with Swagger",
+      description: "API documentation for a modern digital library system built with Node.js, Express, and MongoDB. This API powers a complete online library ecosystem with user authentication, book management, subscription-based borrowing, purchasing, special offers, and comprehensive admin controls.",
     },
     components: {
       securitySchemes: {
