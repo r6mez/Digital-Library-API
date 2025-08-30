@@ -1,0 +1,1798 @@
+{
+	"info": {
+		"_postman_id": "77cf7dd5-9b62-4181-9df2-154e0a227a8d",
+		"name": "Digital-Library-API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33144516",
+		"_collection_link": "https://thanos-5075.postman.co/workspace/Thanos-Workspace~d7adb604-0f62-4990-8070-5ae491ab5e6a/collection/33144516-77cf7dd5-9b62-4181-9df2-154e0a227a8d?action=share&source=collection_link&creator=33144516"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "/auth/login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cache-Control",
+								"value": "no-cache",
+								"type": "text"
+							},
+							{
+								"key": "Postman-Token",
+								"value": "<calculated when request is sent>",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "text/plain",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Content-Length",
+								"value": "<calculated when request is sent>",
+								"type": "text"
+							},
+							{
+								"key": "Host",
+								"value": "<calculated when request is sent>",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "PostmanRuntime/7.39.1",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "*/*",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Encoding",
+								"value": "gzip, deflate, br",
+								"type": "text"
+							},
+							{
+								"key": "Connection",
+								"value": "keep-alive",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"iramezdev@gmail.com\",\n    \"password\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/login",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/auth/register",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Ramez Medhat\",\n  \"email\": \"iramezdev@gmail.com\",\n  \"password\": \"123456\"\n}\n"
+						},
+						"url": {
+							"raw": "http://localhost:5001/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/auth/verify-email",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"2579df06976190f9516ebac5ead959e27bb93f8e580e464b892f47618466ff9a\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/verify-email",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"verify-email"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/auth/forgot-password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"iramezdev@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/forgot-password",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"forgot-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/auth/reset-password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"6c725454536093332bf3a238fa24358646a717689a5c7d751a0a262e81553827\",\n    \"password\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/reset-password",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"reset-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/auth/resend-verification",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"iramezdev@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/resend-verification",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"resend-verification"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "/users/me",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{baseURL}}/users/me",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/users/me/transactions",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{baseURL}}/users/me/transactions",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"users",
+								"me",
+								"transactions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/users/me/subscription",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{baseURL}}/users/me/subscription",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"users",
+								"me",
+								"subscription"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/users/me/subscription-history",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{baseURL}}/users/me/subscription-history",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"users",
+								"me",
+								"subscription-history"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/users/me/owned-books",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{baseURL}}/users/me/owned-books",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"users",
+								"me",
+								"owned-books"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/users/me/borrowed-books",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{baseURL}}/users/me/borrowed-books",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"users",
+								"me",
+								"borrowed-books"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/users/me/offers",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{baseURL}}/users/me/offers",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"users",
+								"me",
+								"offers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/users/me/update-profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Ramez Medhat\",\n    \"password\": \"654321\",\n    \"currentPassword\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/users/me/update-profile",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"users",
+								"me",
+								"update-profile"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "types",
+			"item": [
+				{
+					"name": "/types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/types",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/types",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Horror Book\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/types",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/types/{id}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/types/68b2fa32eeced9ffd4966375",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"types",
+								"68b2fa32eeced9ffd4966375"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/types/{id}",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Joke Book\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/types/68b2fa32eeced9ffd4966375",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"types",
+								"68b2fa32eeced9ffd4966375"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/types/{id}",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/types/68b2fa32eeced9ffd4966375",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"types",
+								"68b2fa32eeced9ffd4966375"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "categories",
+			"item": [
+				{
+					"name": "/categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/categories",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/categories",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test Cat\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/categories",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/categories/{id}",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/categories/68b2fb7fc8989e570148481b",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"categories",
+								"68b2fb7fc8989e570148481b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/categories/{id}",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test Joke\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/categories/68b2fb7fc8989e570148481b",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"categories",
+								"68b2fb7fc8989e570148481b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/categories/{id}",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/categories/68b2fb7fc8989e570148481b",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"categories",
+								"68b2fb7fc8989e570148481b"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "authors",
+			"item": [
+				{
+					"name": "/authors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/authors",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"authors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/authors/{id}",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/authors/68b2ff133755d679fdf9ba72",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"authors",
+								"68b2ff133755d679fdf9ba72"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/authors/{id}/books",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Ramez Medhat\",\n  \"bio\": \"Wrote the book: 'how to not sleep and keep thinking about why things went the way it did', best seller\",\n  \"image_url\": \"https://example.com/images/ramez-medhat.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/authors/68b1d7495c995cfac93f3d62/books",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"authors",
+								"68b1d7495c995cfac93f3d62",
+								"books"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/authors",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Ramez Medhat\",\n  \"bio\": \"Wrote the book: 'how to not sleep and keep thinking about why things went the way it did', best seller\",\n  \"image_url\": \"https://example.com/images/ramez-medhat.jpg\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/authors",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"authors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/authors/{id}",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Ramez Medhat\",\n  \"bio\": \"Wrote the book: 'how to not sleep and keep thinking about why things went the way it did', best seller\",\n  \"image_url\": \"https://example.com/images/ramez-medhat.jpg\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/authors/68b2ff133755d679fdf9ba72",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"authors",
+								"68b2ff133755d679fdf9ba72"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/authors/{id}",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/authors/68b2ff133755d679fdf9ba72",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"authors",
+								"68b2ff133755d679fdf9ba72"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "books",
+			"item": [
+				{
+					"name": "/books",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/books",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"books"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/books",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Byte Dreams\",\n  \"author\": \"68b1c4ad1d5e71b7495aeefe\",\n  \"category\": \"68a9d33b8d370754d0f84d4b\",\n  \"type\": \"68a9d2b98d370754d0f84d37\",\n  \"description\": \"A near-future sci-fi novel about memory trading and the ethical cost of living inside someone else's dreams.\",\n  \"cover_image_url\": \"/uploads/covers/byte-dreams.jpg\",\n  \"pdf_path\": \"/uploads/pdfs/byte-dreams.pdf\",\n  \"publication_date\": \"2024-11-01T00:00:00.000Z\",\n  \"buy_price\": 14.00,\n  \"borrow_price_per_day\": 2.0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/books",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"books"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/books/{id}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/books/68b1c4ad1d5e71b7495aef09",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"books",
+								"68b1c4ad1d5e71b7495aef09"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "books/{id}",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"How to buy a chair and a robe?\",\n    \"author\": \"68b1c4ad1d5e71b7495aeefe\",\n    \"description\": \"A near-future sci-fi novel about memory trading and the ethical cost of living inside someone else's dreams.\",\n    \"cover_image_url\": \"/uploads/covers/byte-dreams.jpg\",\n    \"publication_date\": \"2024-11-01T00:00:00.000Z\",\n    \"category\": \"68a9d33b8d370754d0f84d4b\",\n    \"type\": \"68a9d2b98d370754d0f84d37\",\n    \"buy_price\": 14,\n    \"borrow_price_per_day\": 2,\n    \"pdf_path\": \"/uploads/pdfs/byte-dreams.pdf\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/books/68b1c4ad1d5e71b7495aef09",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"books",
+								"68b1c4ad1d5e71b7495aef09"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/books/{id}",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/books/68b1c4ad1d5e71b7495aef0d",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"books",
+								"68b1c4ad1d5e71b7495aef0d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/books/{id}/buy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/books/68b31c7ef87a1632a44859a4/buy",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"books",
+								"68b31c7ef87a1632a44859a4",
+								"buy"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/books/{id}/borrow",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"days\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/books/68b31c7ef87a1632a44859a3/borrow",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"books",
+								"68b31c7ef87a1632a44859a3",
+								"borrow"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/books/{id}/return",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/books/68b31c7ef87a1632a44859a3/return",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"books",
+								"68b31c7ef87a1632a44859a3",
+								"return"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/books/{id}/pdf",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "pdf",
+									"type": "file",
+									"src": "/Users/ramez.medhat/Documents/Graph Coloring and Bipartite Graph 🖍️🗺️.pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseURL}}/books/68b1d7495c995cfac93f3d6b/pdf",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"books",
+								"68b1d7495c995cfac93f3d6b",
+								"pdf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/books/{id}/pdf",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/books/68b1d7495c995cfac93f3d6a/pdf",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"books",
+								"68b1d7495c995cfac93f3d6a",
+								"pdf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/books/{id}/preview",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/books/68b1d7495c995cfac93f3d6b/preview",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"books",
+								"68b1d7495c995cfac93f3d6b",
+								"preview"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "subscriptions",
+			"item": [
+				{
+					"name": "/subscriptions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "/subscriptions",
+							"path": [
+								"subscriptions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/subscriptions",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Basic\",\n  \"maximum_borrow\": 2,\n  \"price\": 20,\n  \"duration_in_days\": 30\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/subscriptions",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"subscriptions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/subscription/{id}",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Advanced\",\n  \"maximum_borrow\": 10,\n  \"price\": 50,\n  \"duration_in_days\": 30\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/subscriptions/68b3101581e939ce392001ff",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"subscriptions",
+								"68b3101581e939ce392001ff"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/subscription/{id}",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/subscriptions/68b31287518032233dfa8453",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"subscriptions",
+								"68b31287518032233dfa8453"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/subscriptions/{id}/activate",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/subscriptions/68b31d245896150f562df8e0/activate",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"subscriptions",
+								"68b31d245896150f562df8e0",
+								"activate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/subscriptions/{id}/deactivate",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/subscriptions/68b31d395896150f562df8eb/deactivate",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"subscriptions",
+								"68b31d395896150f562df8eb",
+								"deactivate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/subscriptions/stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/subscriptions/stats",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"subscriptions",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "offers",
+			"item": [
+				{
+					"name": "/offers/create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"books\": [\"68b31c7ef87a1632a44859a2\", \"68b31c7ef87a1632a44859a8\", \"68b31c7ef87a1632a44859a9\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/offers/create",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"offers",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/offers/{id}",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/offers/68b328520ab267ad17d92471",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"offers",
+								"68b328520ab267ad17d92471"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/offers/{id}",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"original_price\": 28\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/offers/68b328520ab267ad17d92471",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"offers",
+								"68b328520ab267ad17d92471"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/offers/{id}",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/offers/68b328520ab267ad17d92471",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"offers",
+								"68b328520ab267ad17d92471"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/offers/{id}/accept",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/offers/68b3293b0ab267ad17d9248a/accept",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"offers",
+								"68b3293b0ab267ad17d9248a",
+								"accept"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "transactions",
+			"item": [
+				{
+					"name": "/transaction",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/transactions",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"transactions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/transaction",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YTlmZTRhMjg1ZGZhZjI3OWUzMTljNiIsImlhdCI6MTc1NTk3MTIzOSwiZXhwIjoxNzU1OTc0ODM5fQ.vc9zGUMO8Fm4JRS3BshQVzAtCjaHRwEn6g62dhQw7VE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseURL}}/transaction",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"transaction"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/transaction/{id}",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseURL}}/transactions/68b31df38c80eb322076e89d",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"transactions",
+								"68b31df38c80eb322076e89d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/transactions/{id}",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"bookId\": \"string\",\n  \"amount\": 0,\n  \"type\": \"borrow\",\n  \"description\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/transactions/68b31df38c80eb322076e89d",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"transactions",
+								"68b31df38c80eb322076e89d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/transactions/{id}",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/transactions/68b31df38c80eb322076e89d",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"transactions",
+								"68b31df38c80eb322076e89d"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "http://localhost:5000"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "default"
+		}
+	]
+}

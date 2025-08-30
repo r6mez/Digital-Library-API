@@ -32,6 +32,9 @@ A comprehensive, feature-rich backend API for a modern digital library system bu
 ### **API Documentation**: `http://localhost:5001/api-docs`
 
 ## 🔗 API Endpoints Overview
+
+You can download and import the Postman JSON file from [here](assets/Digital-Library-API.postman_collection.json)
+
 ![](assets/endpoints.png)
 
 ## 📧 Email Notifications
