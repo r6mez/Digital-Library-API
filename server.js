@@ -15,9 +15,6 @@ const { swaggerUi, swaggerSpec } = require("./config/swagger");
 // Load environment variables
 dotenv.config();
 
-// Connect to database
-connectDB();
-
 const app = express();
 
 // Middleware to parse JSON bodies
@@ -42,4 +39,13 @@ app.use('/transactions', transactionRoutes);
 
 
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Connect to database and start the server only after a successful connection
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  })
+  .catch((err) => {
+    console.error('Failed to connect to MongoDB', err);
+    process.exit(1);
+  });
