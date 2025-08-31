@@ -49,6 +49,38 @@ const getRevenueByType = asyncHandler(async (req, res) => {
     res.json({ revenueByType: result });
 });
 
+const getTotalBorrows = asyncHandler(async (req, res) => {
+    const { from, to } = req.query;
+    const filter = {};
+
+    if (from || to) {
+        filter.borrowed_date = {};
+        if (from) filter.borrowed_date.$gte = new Date(from);
+        if (to) filter.borrowed_date.$lte = new Date(to);
+    }
+
+    const total = await BorrowedBook.countDocuments(filter);
+
+    res.json({ totalBorrows: total });
+});
+
+const getBorrowedBooks = asyncHandler(async (req, res) => {
+    const { from, to } = req.query;
+    const filter = {};
+
+    if (from || to) {
+        filter.borrowed_date = {};
+        if (from) filter.borrowed_date.$gte = new Date(from);
+        if (to) filter.borrowed_date.$lte = new Date(to);
+    }
+
+    const borrowed = await BorrowedBook.find(filter)
+        .populate("book", "title author")
+        .populate("user", "name email");
+
+    res.json({ borrowedBooks: borrowed });
+});
+
 
 
 
