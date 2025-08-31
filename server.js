@@ -10,6 +10,7 @@ const authorRoutes = require('./routes/authorRoutes');
 const offerRoutes = require('./routes/offerRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
+const statisticsRoutes = require('./routes/statisticsRoutes');
 const { swaggerUi, swaggerSpec } = require("./config/swagger");
 
 const app = express();
@@ -33,6 +34,8 @@ app.use('/authors', authorRoutes);
 app.use('/offers', offerRoutes);
 app.use('/subscriptions', subscriptionRoutes);
 app.use('/transactions', transactionRoutes);
+
+app.use('/statistics', statisticsRoutes ); 
 
 // Connect to database and start the server only after a successful connection
 connectDB()

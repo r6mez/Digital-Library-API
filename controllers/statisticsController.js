@@ -3,18 +3,32 @@ const BorrowedBook = require('../models/borrowedBookModel');
 const OwendBook = require('../models/owendBookModel');
 const Transaction = require('../models/transactionModel');
 
-const dateFilter = (from, to, defaultDays = 30) => {
-    let filter = {};
-    let fromDate = from ? new Date(from) : null;
-    let toDate = to ? new Date(to) : null;
 
-    if (!fromDate && !toDate) {
+
+
+// you can filter by from, to or  days 
+/*
+?days=7
+?from=2023-01-01&to=2023-12-31
+or the default last 30 days
+*/
+const dateFilter = (from, to, days, defaultDays = 30) => {
+    let fromDate, toDate;
+
+    if (days) {
+        fromDate = new Date();
+        fromDate.setDate(fromDate.getDate() - days);
+        toDate = new Date();
+    } else if (from || to) {
+        fromDate = from ? new Date(from) : null;
+        toDate = to ? new Date(to) : null;
+    } else {
         fromDate = new Date();
         fromDate.setDate(fromDate.getDate() - defaultDays);
         toDate = new Date();
     }
 
-    filter.createdAt = {};
+    let filter = { createdAt: {} };
     if (fromDate) filter.createdAt.$gte = fromDate;
     if (toDate) filter.createdAt.$lte = toDate;
 
@@ -23,8 +37,8 @@ const dateFilter = (from, to, defaultDays = 30) => {
 
 
 const getTotalRevenue = asyncHandler(async (req, res) => {
-    const { from, to } = req.query;
-    const filter = dateFilter(from, to);
+    const { from, to, days } = req.query;
+    const filter = dateFilter(from, to, Number(days));
 
     const result = await Transaction.aggregate([
         { $match: filter },
@@ -35,8 +49,8 @@ const getTotalRevenue = asyncHandler(async (req, res) => {
 });
 
 const getRevenueByType = asyncHandler(async (req, res) => {
-    const { from, to } = req.query;
-    const filter = dateFilter(from, to);
+    const { from, to, days } = req.query;
+    const filter = dateFilter(from, to, Number(days));
 
     const result = await Transaction.aggregate([
         { $match: filter },
@@ -47,8 +61,8 @@ const getRevenueByType = asyncHandler(async (req, res) => {
 });
 
 const getBorrowedBooks = asyncHandler(async (req, res) => {
-    const { from, to } = req.query;
-    const filter = dateFilter(from, to);
+    const { from, to, days } = req.query;
+    const filter = dateFilter(from, to, Number(days));
 
     const borrows = await BorrowedBook.find(filter)
         .populate("book", "title")
@@ -66,8 +80,8 @@ const getBorrowedBooks = asyncHandler(async (req, res) => {
 });
 
 const getSoldBooks = asyncHandler(async (req, res) => {
-    const { from, to } = req.query;
-    const filter = dateFilter(from, to);
+    const { from, to, days } = req.query;
+    const filter = dateFilter(from, to, Number(days));
 
     const sold = await OwendBook.find(filter)
         .populate("book", "title")
@@ -83,9 +97,65 @@ const getSoldBooks = asyncHandler(async (req, res) => {
     res.json(result);
 });
 
+er = require("../models/userModel");
+
+const getLibraryStatistics = asyncHandler(async (req, res) => {
+    // Find best book
+    const bestBookAgg = await OwendBook.aggregate([
+        { $group: { _id: "$book", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 1 }
+    ]);
+
+    let bestBook = null;
+    let bestAuthor = null;
+
+    if (bestBookAgg.length > 0) {
+        bestBook = await Book.findById(bestBookAgg[0]._id).populate("author", "name");
+
+        if (bestBook) {
+            const bestAuthorAgg = await OwendBook.aggregate([
+                {
+                    $lookup: {
+                        from: "books",
+                        localField: "book",
+                        foreignField: "_id",
+                        as: "bookDetails"
+                    }
+                },
+                { $unwind: "$bookDetails" },
+                { $group: { _id: "$bookDetails.author", count: { $sum: 1 } } },
+                { $sort: { count: -1 } },
+                { $limit: 1 }
+            ]);
+
+            if (bestAuthorAgg.length > 0) {
+                bestAuthor = await Author.findById(bestAuthorAgg[0]._id);
+            }
+        }
+    }
+
+    //  counts
+    const totalUsers = await User.countDocuments();
+    const totalBooks = await Book.countDocuments();
+    const totalAuthors = await Author.countDocuments();
+
+    res.json({
+        bestBook: bestBook ? bestBook.title : null,
+        bestAuthor: bestAuthor ? bestAuthor.name : null,
+        stats: {
+            totalUsers,
+            totalBooks,
+            totalAuthors
+        }
+    });
+});
+
+
 module.exports = {
     getTotalRevenue,
     getRevenueByType,
     getBorrowedBooks,
-    getSoldBooks
+    getSoldBooks,
+    getLibraryStatistics
 };
