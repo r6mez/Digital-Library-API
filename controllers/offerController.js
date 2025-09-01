@@ -2,7 +2,6 @@ const Offer = require("../models/offerModel");
 const Book = require("../models/bookModel");
 const OfferedBook = require("../models/offeredBook");
 const OwendBook = require("../models/owendBookModel");
-const User = require("../models/userModel");
 const Transaction = require("../models/transactionModel");
 const { sendOfferPurchaseEmail } = require("../utils/emailService");
 const asyncHandler = require("../utils/asyncHandler");
@@ -48,7 +47,6 @@ const createOffer = asyncHandler(async (req, res) => {
     res.status(200).json({ offer, offeredBooks });
 });
 
-// GET /offer/:id -> return offer + included books + prices
 const getOfferById = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const offer = await Offer.findById(id).lean();
@@ -73,7 +71,6 @@ const getOfferById = asyncHandler(async (req, res) => {
     });
 });
 
-// POST /offer/:id/accept -> purchase all books in the offer for discounted_price
 const acceptOffer = asyncHandler(async (req, res) => {
     const user = req.user; // set by protect middleware
     const offerId = req.params.id;
@@ -136,7 +133,6 @@ const acceptOffer = asyncHandler(async (req, res) => {
     res.status(200).json({ message: 'Offer purchased successfully', owned, transaction });
 });
 
-// PUT /offer/:id -> admin only: update offer fields and optionally books
 const updateOffer = asyncHandler(async (req, res) => {
     const offerId = req.params.id;
     const { discounted_price, original_price, books } = req.body;
@@ -178,7 +174,6 @@ const updateOffer = asyncHandler(async (req, res) => {
     res.status(200).json({ message: 'Offer updated', offer });
 });
 
-// DELETE /offer/:id -> admin only: remove offer and its offeredBook records
 const deleteOffer = asyncHandler(async (req, res) => {
     const offerId = req.params.id;
     const offer = await Offer.findById(offerId);
