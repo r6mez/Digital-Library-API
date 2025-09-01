@@ -1,18 +1,10 @@
 const express = require("express");
 const router = express.Router();
+const { getSubscriptionStatistics, getTotalRevenue, getRevenueByType, getLibraryStatistics } = require("../controllers/statisticsController");
 
-const {
-    getTotalRevenue,
-    getRevenueByType,
-    getBorrowedBooks,
-    getSoldBooks,
-    getLibraryStatistics
-} = require("../controllers/statisticsController");
-
-router.get("/libraryStatistics", getLibraryStatistics);
+router.get("/library", getLibraryStatistics);
 router.get("/revenue/total", getTotalRevenue);
 router.get("/revenue/type", getRevenueByType);
-router.get("/books/borrowed", getBorrowedBooks);
-router.get("/books/sold", getSoldBooks);
+router.get("/subscriptions", getSubscriptionStatistics);
 
 module.exports = router;

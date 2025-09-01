@@ -4,9 +4,10 @@ const asyncHandler = require('../utils/asyncHandler');
 const User = require('../models/userModel');
 const OwnedBook = require('../models/owendBookModel');
 const BorrowedBook = require('../models/borrowedBookModel');
-const Transaction = require('../models/transactionModel');
+const Transaction = require('../models/TransactionModel');
 const ActiveSubscription = require('../models/activeSubscribtionModel');
 const Subscription = require('../models/subscriptionModel');
+const { dateFilter } = require('../utils/dataUtils');
 const { sendBookBorrowEmail, sendBookPurchaseEmail } = require('../utils/emailService');
 const path = require('path');
 const fs = require('fs');  
@@ -397,17 +398,58 @@ const returnBook = asyncHandler(async (req, res, next) => {
     }
 });
 
+const getBorrowedBooks = asyncHandler(async (req, res) => {
+    const { from, to, days } = req.query;
+    const filter = dateFilter(from, to, Number(days));
 
+    const borrows = await BorrowedBook.find(filter)
+        .populate("book", "name")
+        .select("book return_date");
 
-module.exports = { getBooks,
-     getBookById,
-      createBook,
-     updateBook,
-      deleteBook,
-       borrowBook,
-       buyBook,
-       uploadBookPDF,
-       getBookPDF,
-    previewPDF,
-    returnBook
+    const result = {
+        count: borrows.length,
+        books: borrows.map(b => ({
+            title: b.book?.name || "Unknown",
+            returnDate: b.return_date
+        }))
     };
+
+    res.json(result);
+});
+
+const getSoldBooks = asyncHandler(async (req, res) => {
+    const { from, to, days } = req.query;
+    const filter = dateFilter(from, to, Number(days));
+
+    const sold = await OwnedBook.find(filter)
+        .populate("book", "_id name")
+        .select("book");
+
+    const result = {
+        count: sold.length,
+        books: sold.map(s => ({
+            id: s.book?._id,
+            title: s.book?.name || "Unknown"
+        }))
+    };
+
+    res.json(result);
+});
+
+
+
+module.exports = { 
+    getBooks,
+    getBookById,
+    createBook,
+    updateBook,
+    deleteBook,
+    borrowBook,
+    buyBook,
+    uploadBookPDF,
+    getBookPDF,
+    previewPDF,
+    returnBook,
+    getBorrowedBooks,
+    getSoldBooks
+};
