@@ -1,10 +1,10 @@
+const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require("swagger-ui-express");
 const resolveBaseUrl = require('../utils/resolveBaseUrl');
-const swaggerPaths = require('./swaggerPaths');
-const swaggerSchemas = require('./swaggerSchemas');
+const path = require('path');
 
-// Create the swagger spec directly without relying on file parsing
-const swaggerSpec = {
+// Swagger definition
+const swaggerDefinition = {
   openapi: "3.0.0",
   info: {
     title: "Digital Library API",
@@ -18,9 +18,11 @@ const swaggerSpec = {
         scheme: 'bearer',
         bearerFormat: 'JWT'
       }
-    },
-    schemas: swaggerSchemas
+    }
   },
+  servers: [
+    { url: resolveBaseUrl() }
+  ],
   tags: [
     { name: 'Auth', description: 'Authentication routes' },
     { name: 'Users', description: 'User management and profile' },
@@ -30,17 +32,22 @@ const swaggerSpec = {
     { name: 'Books', description: 'Book endpoints' },
     { name: 'Subscriptions', description: 'Subscription management and activation' },
     { name: 'Offers', description: 'Offers endpoints' },
-    { name: 'Statistics', description: 'Analytics and library insights' }
-  ],
-  servers: [
-    { url: resolveBaseUrl() },
-  ],
-  paths: swaggerPaths
+    { name: 'Statistics', description: 'Analytics and library insights' },
+    { name: 'Transactions', description: 'Transaction management' }
+  ]
 };
 
-// Debug the generated spec
-console.log('Generated swagger spec paths:', Object.keys(swaggerSpec.paths || {}));
-console.log('Available paths count:', Object.keys(swaggerSpec.paths || {}).length);
+// Options for swagger-jsdoc
+const swaggerOptions = {
+  definition: swaggerDefinition,
+  apis: [
+    path.join(__dirname, '../docs/controllersDocs/*.js'),
+    path.join(__dirname, '../docs/modelsDocs/*.js')
+  ]
+};
+
+// Generate swagger specification
+const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
 // Custom Swagger UI options for better Vercel compatibility
 const swaggerUiOptions = {
