@@ -29,8 +29,7 @@ A comprehensive, feature-rich backend API for a modern digital library system bu
 
 ## 📚 API Documentation
 
-### **Base URL**: `http://localhost:5001`
-### **API Documentation**: `http://localhost:5001/api-docs`
+You can access it from here https://digital-library-api.vercel.app/api-docs
 
 ## 🔗 API Endpoints Overview
 
