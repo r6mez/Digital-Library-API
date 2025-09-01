@@ -36,12 +36,24 @@ const options = {
     ],
   },
   apis: [
-    path.join(__dirname, "../docs/controllersDocs/*.js"),
-    path.join(__dirname, "../docs/modelsDocs/*.js"),
+    path.resolve(__dirname, "../docs/controllersDocs/*.js"),
+    path.resolve(__dirname, "../docs/modelsDocs/*.js"),
+    // Also try absolute paths for Vercel
+    "./docs/controllersDocs/*.js",
+    "./docs/modelsDocs/*.js"
   ],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
+
+// Debug the generated spec
+console.log('Generated swagger spec paths:', Object.keys(swaggerSpec.paths || {}));
+console.log('Available paths count:', Object.keys(swaggerSpec.paths || {}).length);
+
+// If no paths are found, it might be a file loading issue
+if (!swaggerSpec.paths || Object.keys(swaggerSpec.paths).length === 0) {
+  console.warn('Warning: No API paths found in swagger spec. This might be due to file loading issues in serverless environment.');
+}
 
 // Custom Swagger UI options for better Vercel compatibility
 const swaggerUiOptions = {

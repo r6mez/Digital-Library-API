@@ -26,6 +26,10 @@ const setupSwaggerUI = (app) => {
   // Serve custom HTML for Swagger UI with embedded spec
   app.get('/api-docs', (req, res) => {
     try {
+      // Debug the swagger spec
+      console.log('Swagger spec paths:', Object.keys(swaggerSpec.paths || {}));
+      console.log('Swagger spec info:', swaggerSpec.info);
+      
       const customHtml = `
         <!DOCTYPE html>
         <html>
@@ -37,18 +41,29 @@ const setupSwaggerUI = (app) => {
             *, *:before, *:after { box-sizing: inherit; }
             body { margin:0; background: #fafafa; }
             .loading { text-align: center; padding: 50px; font-family: Arial, sans-serif; }
+            .debug { background: #f5f5f5; padding: 20px; margin: 20px; border-radius: 5px; font-family: monospace; }
           </style>
         </head>
         <body>
           <div id="swagger-ui">
             <div class="loading">Loading API Documentation...</div>
           </div>
+          
+          <!-- Debug info -->
+          <div class="debug">
+            <h3>Debug Info:</h3>
+            <p>Spec paths count: ${Object.keys(swaggerSpec.paths || {}).length}</p>
+            <p>Available paths: ${JSON.stringify(Object.keys(swaggerSpec.paths || {}), null, 2)}</p>
+          </div>
+          
           <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-bundle.js" charset="UTF-8"></script>
           <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-standalone-preset.js" charset="UTF-8"></script>
           <script>
             window.onload = function() {
               try {
                 const spec = ${JSON.stringify(swaggerSpec)};
+                console.log('Loaded spec:', spec);
+                console.log('Spec paths:', spec.paths);
                 
                 const ui = SwaggerUIBundle({
                   spec: spec,
@@ -70,7 +85,7 @@ const setupSwaggerUI = (app) => {
               } catch (error) {
                 console.error('Error initializing Swagger UI:', error);
                 document.getElementById('swagger-ui').innerHTML = 
-                  '<div class="loading">Error loading API documentation. Please refresh the page.</div>';
+                  '<div class="loading">Error loading API documentation: ' + error.message + '</div>';
               }
             };
             
