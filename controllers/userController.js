@@ -7,7 +7,7 @@ const OwnedBooks = require('../models/owendBookModel');
 const BorrowedBook = require('../models/borrowedBookModel');
 const Offer = require('../models/offerModel');
 const OfferedBook = require('../models/offeredBook');
-const Transaction = require('../models/TransactionModel');
+const Transaction = require('../models/transactionModel');
 
 const getSignedUser = asyncHandler(async (req, res) => {
   res.status(200).json(req.user);

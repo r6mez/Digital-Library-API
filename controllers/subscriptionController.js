@@ -1,6 +1,6 @@
 const Subscription = require('../models/subscriptionModel');
 const activeSubscriptionsModel = require('../models/activeSubscribtionModel');
-const Transaction = require('../models/TransactionModel');
+const Transaction = require('../models/transactionModel');
 const User = require('../models/userModel');
 const asyncHandler = require('../utils/asyncHandler');
 const { sendSubscriptionActivationEmail } = require('../utils/emailService');
