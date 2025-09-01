@@ -5,31 +5,13 @@ const { swaggerUi, swaggerSpec, swaggerUiOptions } = require("../config/swagger"
  * Ensures CSS and JS files are served with correct Content-Type headers
  */
 const fixSwaggerMimeTypes = (req, res, next) => {
-  const originalSend = res.send;
-  const originalJson = res.json;
+  // Set MIME types based on URL patterns - simplified for Vercel compatibility
+  const url = req.url || '';
+  const path = req.path || '';
   
-  // Override res.send to set correct MIME types
-  res.send = function(data) {
-    if (req.url.includes('swagger-ui') || req.path.includes('swagger-ui')) {
-      if (req.url.endsWith('.css') || req.path.endsWith('.css') || req.url.includes('swagger-ui.css')) {
-        res.setHeader('Content-Type', 'text/css');
-      } else if (req.url.endsWith('.js') || req.path.endsWith('.js') || 
-                 req.url.includes('swagger-ui-bundle.js') || 
-                 req.url.includes('swagger-ui-standalone-preset.js') ||
-                 req.url.includes('swagger-ui-init.js')) {
-        res.setHeader('Content-Type', 'application/javascript');
-      }
-    }
-    return originalSend.call(this, data);
-  };
-  
-  // Set MIME types based on URL patterns
-  if (req.url.endsWith('.css') || req.path.endsWith('.css') || req.url.includes('swagger-ui.css')) {
+  if (url.includes('.css') || path.includes('.css')) {
     res.setHeader('Content-Type', 'text/css');
-  } else if (req.url.endsWith('.js') || req.path.endsWith('.js') || 
-             req.url.includes('swagger-ui-bundle.js') || 
-             req.url.includes('swagger-ui-standalone-preset.js') ||
-             req.url.includes('swagger-ui-init.js')) {
+  } else if (url.includes('.js') || path.includes('.js')) {
     res.setHeader('Content-Type', 'application/javascript');
   }
   
@@ -44,11 +26,8 @@ const setupSwaggerUI = (app) => {
   // Apply MIME type fix middleware for Swagger UI assets
   app.use('/api-docs', fixSwaggerMimeTypes);
   
-  // More explicit Swagger UI setup for better Vercel compatibility
-  app.get('/api-docs', (req, res, next) => {
-    res.setHeader('Content-Type', 'text/html');
-    next();
-  }, swaggerUi.serve[0], swaggerUi.setup(swaggerSpec, {
+  // Setup Swagger UI with CDN assets for better Vercel compatibility
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
     ...swaggerUiOptions,
     customJs: [
       'https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-bundle.js',
@@ -56,16 +35,6 @@ const setupSwaggerUI = (app) => {
     ],
     customCssUrl: 'https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui.css'
   }));
-  
-  // Fallback route for assets
-  app.use('/api-docs/*', (req, res, next) => {
-    if (req.url.includes('.css')) {
-      res.setHeader('Content-Type', 'text/css');
-    } else if (req.url.includes('.js')) {
-      res.setHeader('Content-Type', 'application/javascript');
-    }
-    next();
-  }, swaggerUi.serve);
 };
 
 /**
