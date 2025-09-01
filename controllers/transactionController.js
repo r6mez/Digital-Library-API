@@ -1,4 +1,4 @@
-const Transaction = require('../models/TransactionModel');
+const Transaction = require('../models/transactionModel');
 const asyncHandler = require('../utils/asyncHandler');
 
 // Get all transactions
