@@ -26,26 +26,14 @@ A comprehensive, feature-rich backend API for a modern digital library system bu
 - **Joi** - Object schema validation
 - **Swagger-ui** - API documentation
 - **Nodemailer** - Email service integration
+- **express-rate-limit** - limit the rate of requests
 
 ## 📚 API Documentation
 
-You can access it from here https://digital-library-api.vercel.app/api-docs
+- **Swagger UI:** You can view and all the endpoints from here https://digital-library-api.vercel.app/api-docs
+- **Postman 🧑🏻‍🚀:** You can download and import the Postman JSON file from [here](assets/Digital-Library-API.postman_collection.json)
 
-## 🔗 API Endpoints Overview
-
-You can download and import the Postman JSON file from [here](assets/Digital-Library-API.postman_collection.json)
-
-![](assets/endpoints.png)
-
-## 📧 Email Notifications
-
-The system sends automated emails for:
-- **Account Verification**: Welcome email with verification link
-- **Password Reset**: Secure reset link with expiry
-- **Book Purchase**: Purchase confirmation with details
-- **Book Borrowing**: Borrowing confirmation with return date
-- **Subscription Activation**: Plan details and benefits
-- **Offer Purchase**: Bulk purchase confirmation
+![Endpoints](assets/endpoints.png)
 
 ## 📋 Prerequisites
 

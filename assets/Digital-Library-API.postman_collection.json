@@ -131,7 +131,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": \"2579df06976190f9516ebac5ead959e27bb93f8e580e464b892f47618466ff9a\"\n}",
+							"raw": "{\n    \"token\": \"38e11bc22ddd76cd73d02846d06369cce58f49506392642cf5da9480396ebcbb\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -185,7 +185,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": \"6c725454536093332bf3a238fa24358646a717689a5c7d751a0a262e81553827\",\n    \"password\": \"123456\"\n}",
+							"raw": "{\n    \"token\": \"5a2de22203c731f3ad43b1cb10d1b621d7a46bf96799086af41a80c235fa41c9\",\n    \"password\": \"123456\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1071,13 +1071,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseURL}}/books/68b31c7ef87a1632a44859a4/buy",
+							"raw": "{{baseURL}}/books/68b31c7ef87a1632a44859a6/buy",
 							"host": [
 								"{{baseURL}}"
 							],
 							"path": [
 								"books",
-								"68b31c7ef87a1632a44859a4",
+								"68b31c7ef87a1632a44859a6",
 								"buy"
 							]
 						}
@@ -1223,6 +1223,54 @@
 								"books",
 								"68b1d7495c995cfac93f3d6b",
 								"preview"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/books/sold",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/books/sold",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"books",
+								"sold"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/books/borrowed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/books/borrowed",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"books",
+								"borrowed"
 							]
 						}
 					},
@@ -1381,30 +1429,6 @@
 								"subscriptions",
 								"68b31d395896150f562df8eb",
 								"deactivate"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/subscriptions/stats",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseURL}}/subscriptions/stats",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"subscriptions",
-								"stats"
 							]
 						}
 					},
@@ -1727,6 +1751,109 @@
 							"path": [
 								"transactions",
 								"68b31df38c80eb322076e89d"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "statistics",
+			"item": [
+				{
+					"name": "/statistics/library",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/statistics/library",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"statistics",
+								"library"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/statistics/revenue/type",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/statistics/revenue/type",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"statistics",
+								"revenue",
+								"type"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/statistics/revenue/total",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/statistics/revenue/total",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"statistics",
+								"revenue",
+								"total"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/statistics/subscriptions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/statistics/subscriptions",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"statistics",
+								"subscriptions"
 							]
 						}
 					},
