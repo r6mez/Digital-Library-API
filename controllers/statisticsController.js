@@ -1,37 +1,11 @@
 const Book = require('../models/bookModel');
 const Author = require('../models/authorModel');
 const User = require('../models/userModel');
-const Transaction = require('../models/transactionModel');
-const BorrowedBook = require('../models/borrowedBookModel');
+const Transaction = require('../models/TransactionModel');
+const OwendBook = require('../models/owendBookModel');
 const asyncHandler = require('../utils/asyncHandler');
-
-
-
-
-
-const dateFilter = (from, to, days, defaultDays = 30) => {
-    let fromDate, toDate;
-
-    if (days) {
-        fromDate = new Date();
-        fromDate.setDate(fromDate.getDate() - days);
-        toDate = new Date();
-    } else if (from || to) {
-        fromDate = from ? new Date(from) : null;
-        toDate = to ? new Date(to) : null;
-    } else {
-        fromDate = new Date();
-        fromDate.setDate(fromDate.getDate() - defaultDays);
-        toDate = new Date();
-    }
-
-    let filter = { createdAt: {} };
-    if (fromDate) filter.createdAt.$gte = fromDate;
-    if (toDate) filter.createdAt.$lte = toDate;
-
-    return filter;
-};
-
+const activeSubscriptionsModel = require('../models/activeSubscribtionModel');
+const { dateFilter } = require('../utils/dataUtils');
 
 const getTotalRevenue = asyncHandler(async (req, res) => {
     const { from, to, days } = req.query;
@@ -57,47 +31,7 @@ const getRevenueByType = asyncHandler(async (req, res) => {
     res.json({ revenueByType: result });
 });
 
-const getBorrowedBooks = asyncHandler(async (req, res) => {
-    const { from, to, days } = req.query;
-    const filter = dateFilter(from, to, Number(days));
-
-    const borrows = await BorrowedBook.find(filter)
-        .populate("book", "title")
-        .select("book return_date");
-
-    const result = {
-        count: borrows.length,
-        books: borrows.map(b => ({
-            title: b.book?.title || "Unknown",
-            returnDate: b.return_date
-        }))
-    };
-
-    res.json(result);
-});
-
-const getSoldBooks = asyncHandler(async (req, res) => {
-    const { from, to, days } = req.query;
-    const filter = dateFilter(from, to, Number(days));
-
-    const sold = await OwendBook.find(filter)
-        .populate("book", "title")
-        .select("book");
-
-    const result = {
-        count: sold.length,
-        books: sold.map(s => ({
-            title: s.book?.title || "Unknown"
-        }))
-    };
-
-    res.json(result);
-});
-
-er = require("../models/userModel");
-
 const getLibraryStatistics = asyncHandler(async (req, res) => {
-    // Find best book
     const bestBookAgg = await OwendBook.aggregate([
         { $group: { _id: "$book", count: { $sum: 1 } } },
         { $sort: { count: -1 } },
@@ -132,13 +66,12 @@ const getLibraryStatistics = asyncHandler(async (req, res) => {
         }
     }
 
-    //  counts
     const totalUsers = await User.countDocuments();
     const totalBooks = await Book.countDocuments();
     const totalAuthors = await Author.countDocuments();
 
     res.json({
-        bestBook: bestBook ? bestBook.title : null,
+        bestBook: bestBook ? bestBook.name : null,
         bestAuthor: bestAuthor ? bestAuthor.name : null,
         stats: {
             totalUsers,
@@ -148,11 +81,28 @@ const getLibraryStatistics = asyncHandler(async (req, res) => {
     });
 });
 
+const getSubscriptionStatistics = asyncHandler(async (req, res) => {
+    const now = new Date();
+    const totalCount = await activeSubscriptionsModel.countDocuments({});
+    const activeCount = await activeSubscriptionsModel.countDocuments({ deadline: { $gt: now } });
+    const expiredCount = await activeSubscriptionsModel.countDocuments({ deadline: { $lte: now } });
+
+    const stats = {
+        total: totalCount,
+        active: activeCount,
+        expired: expiredCount
+    };
+
+    res.status(200).json({
+        success: true,
+        data: stats
+    });
+});
+
 
 module.exports = {
     getTotalRevenue,
     getRevenueByType,
-    getBorrowedBooks,
-    getSoldBooks,
-    getLibraryStatistics
+    getLibraryStatistics,
+    getSubscriptionStatistics
 };

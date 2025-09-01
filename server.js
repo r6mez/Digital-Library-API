@@ -34,7 +34,6 @@ app.use('/authors', authorRoutes);
 app.use('/offers', offerRoutes);
 app.use('/subscriptions', subscriptionRoutes);
 app.use('/transactions', transactionRoutes);
-
 app.use('/statistics', statisticsRoutes ); 
 
 // Connect to database and start the server only after a successful connection

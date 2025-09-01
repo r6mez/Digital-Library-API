@@ -45,7 +45,7 @@
 
 /**
  * @swagger
- * /statistics/revenue/by-type:
+ * /statistics/revenue/type:
  *   get:
  *     summary: Get revenue grouped by transaction type
  *     tags: [Statistics]
@@ -89,85 +89,45 @@
 
 /**
  * @swagger
- * /statistics/borrowed:
+ * /statistics/subscriptions:
  *   get:
- *     summary: Get borrowed books with return dates
+ *     summary: Get subscription statistics (Admin only)
+ *     description: Get statistics about total, active, and expired subscriptions. Admin access required.
  *     tags: [Statistics]
- *     parameters:
- *       - in: query
- *         name: from
- *         schema:
- *           type: string
- *           format: date
- *       - in: query
- *         name: to
- *         schema:
- *           type: string
- *           format: date
- *       - in: query
- *         name: days
- *         schema:
- *           type: integer
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Borrowed books list
+ *         description: Subscription statistics
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 count:
- *                   type: integer
- *                 books:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       title:
- *                         type: string
- *                       returnDate:
- *                         type: string
- *                         format: date
- */
-
-/**
- * @swagger
- * /statistics/sold:
- *   get:
- *     summary: Get sold books
- *     tags: [Statistics]
- *     parameters:
- *       - in: query
- *         name: from
- *         schema:
- *           type: string
- *           format: date
- *       - in: query
- *         name: to
- *         schema:
- *           type: string
- *           format: date
- *       - in: query
- *         name: days
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Sold books list
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 count:
- *                   type: integer
- *                 books:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       title:
- *                         type: string
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: integer
+ *                       description: Total number of subscriptions (including expired)
+ *                       example: 150
+ *                     active:
+ *                       type: integer
+ *                       description: Number of currently active subscriptions
+ *                       example: 45
+ *                     expired:
+ *                       type: integer
+ *                       description: Number of expired subscriptions
+ *                       example: 105
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - Admin access required
+ *       500:
+ *         description: Server error
  */
 
 /**

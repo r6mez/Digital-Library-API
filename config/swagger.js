@@ -28,7 +28,8 @@ const options = {
       { name: 'Authors', description: 'Authors management' },
       { name: 'Books', description: 'Book endpoints' },
       { name: 'Subscriptions', description: 'Subscription management and activation' },
-      { name: 'Offers', description: 'Offers endpoints' }
+      { name: 'Offers', description: 'Offers endpoints' },
+      { name: 'Statistics', description: 'Analytics and library insights' }
     ],
     servers: [
       { url: resolveBaseUrl() },

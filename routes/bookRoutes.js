@@ -1,17 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const validate = require('../validators/validate');
-const { getBooks, getBookById, createBook, updateBook, deleteBook, buyBook, borrowBook, uploadBookPDF, getBookPDF, previewPDF, returnBook } = require('../controllers/bookController');
+const { getSoldBooks, getBorrowedBooks, getBooks, getBookById, createBook, updateBook, deleteBook, buyBook, borrowBook, uploadBookPDF, getBookPDF, previewPDF, returnBook } = require('../controllers/bookController');
 const { protect } = require('../middleware/authMiddleware');
 const { admin } = require('../middleware/adminMiddleware');
 const upload = require('../middleware/upload');
 const { bookSchema, borrowBookSchema } = require('../validators/bookValidator');
 
 router.get('/', getBooks);
+router.get('/borrowed', protect, admin, getBorrowedBooks);
+router.get('/sold', protect, admin, getSoldBooks);
 router.get('/:id', getBookById);
 
-router.post('/:id/buy', protect, buyBook);
-router.post('/:id/borrow', protect, validate(borrowBookSchema), borrowBook);
+router.post('/:id/sold', protect, buyBook);
+router.post('/:id/borrowed', protect, validate(borrowBookSchema), borrowBook);
 router.post('/:id/return', protect, returnBook);
 
 router.post('/', protect, admin, validate(bookSchema), createBook);

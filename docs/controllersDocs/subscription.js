@@ -158,7 +158,7 @@
  * /subscriptions/{id}/activate:
  *   post:
  *     summary: Activate a subscription
- *     description: Purchase and activate a subscription for the authenticated user. Only one active subscription allowed per user.
+ *     description: Purchase and activate a subscription for the authenticated user. Only one active subscription allowed per user. Sends confirmation email upon successful activation.
  *     tags: [Subscriptions]
  *     security:
  *       - bearerAuth: []
@@ -169,16 +169,9 @@
  *         description: The ID of the subscription plan to activate
  *         schema:
  *           type: string
- *     requestBody:
- *       required: false
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             description: No request body required - subscription ID comes from URL parameter
  *     responses:
  *       201:
- *         description: Subscription activated successfully
+ *         description: Subscription activated successfully and confirmation email sent
  *         content:
  *           application/json:
  *             schema:
@@ -197,6 +190,7 @@
  *                     remainingBalance:
  *                       type: number
  *                       description: User's remaining balance after purchase
+ *                       example: 450.50
  *       400:
  *         description: Bad request (already has active subscription or insufficient funds)
  *         content:
@@ -222,6 +216,8 @@
  *         description: Subscription plan not found
  *       401:
  *         description: Unauthorized
+ *       500:
+ *         description: Server error
  */
 
 
@@ -268,41 +264,4 @@
  *       403:
  *         description: Forbidden - Admin access required
  *
- * /subscriptions/stats:
- *   get:
- *     summary: Get subscription statistics (Admin only)
- *     description: Get statistics about total, active, and expired subscriptions. Admin access required.
- *     tags: [Subscriptions]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Subscription statistics
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     total:
- *                       type: integer
- *                       description: Total number of subscriptions (including expired)
- *                       example: 150
- *                     active:
- *                       type: integer
- *                       description: Number of currently active subscriptions
- *                       example: 45
- *                     expired:
- *                       type: integer
- *                       description: Number of expired subscriptions
- *                       example: 105
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - Admin access required
- */
+

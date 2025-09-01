@@ -1,6 +1,6 @@
 const Subscription = require('../models/subscriptionModel');
 const activeSubscriptionsModel = require('../models/activeSubscribtionModel');
-const Transaction = require('../models/transactionModel');
+const Transaction = require('../models/TransactionModel');
 const User = require('../models/userModel');
 const asyncHandler = require('../utils/asyncHandler');
 const { sendSubscriptionActivationEmail } = require('../utils/emailService');
@@ -181,25 +181,6 @@ const deactivateSubscription = asyncHandler(async (req, res, next) => {
   });
 });
 
-// Admin endpoint to get subscription statistics
-const getSubscriptionStatistics = asyncHandler(async (req, res) => {
-  const now = new Date();
-  const totalCount = await activeSubscriptionsModel.countDocuments({});
-  const activeCount = await activeSubscriptionsModel.countDocuments({ deadline: { $gt: now } });
-  const expiredCount = await activeSubscriptionsModel.countDocuments({ deadline: { $lte: now } });
-
-  const stats = {
-    total: totalCount,
-    active: activeCount,
-    expired: expiredCount
-  };
-
-  res.status(200).json({
-    success: true,
-    data: stats
-  });
-});
-
 module.exports = { 
   getSubscriptions, 
   createSubscription, 
@@ -207,6 +188,5 @@ module.exports = {
   deleteSubscription, 
   activateSubscription, 
   deactivateSubscription,
-  getSubscriptionStatistics 
 };
 

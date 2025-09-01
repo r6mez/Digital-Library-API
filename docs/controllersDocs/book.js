@@ -196,7 +196,7 @@
     
     /**
      * @swagger
-     * /books/{id}/borrow:
+     * /books/{id}/borrowed:
      *   post:
      *     summary: Borrow a book
      *     tags: [Books]
@@ -208,6 +208,7 @@
      *         required: true
      *         schema:
      *           type: string
+     *         description: ID of the book to borrow
      *     requestBody:
      *       required: true
      *       content:
@@ -215,12 +216,13 @@
      *           schema:
      *             type: object
      *             properties:
-     *               user:
-     *                 type: string
-     *               amount:
-     *                 type: number
-     *               description:
-     *                 type: string
+     *               days:
+     *                 type: integer
+     *                 description: Number of days to borrow the book
+     *                 minimum: 1
+     *                 example: 7
+     *             required:
+     *               - days
      *     responses:
      *       201:
      *         description: Book borrowed successfully
@@ -231,20 +233,13 @@
      *               properties:
      *                 message:
      *                   type: string
+     *                   example: Book borrowed successfully
      *                 transaction:
-     *                   type: object
-     *                   properties:
-     *                     _id:
-     *                       type: string
-     *                     user:
-     *                       type: string
-     *                     book:
-     *                       type: string
-     *                     createdAt:
-     *                       type: string
-     *                       format: date-time
+     *                   $ref: '#/components/schemas/Transaction'
+     *                 borrowedBook:
+     *                   $ref: '#/components/schemas/BorrowedBook'
      *       400:
-     *         description: Bad request (insufficient funds or already borrowed)
+     *         description: Bad request (insufficient funds, already borrowed, or exceeded subscription quota)
      *       401:
      *         description: Unauthorized (missing or invalid token)
      *       404:
@@ -309,7 +304,7 @@
     
     /**
      * @swagger
-     * /books/{id}/buy:
+     * /books/{id}/sold:
      *   post:
      *     summary: Buy a book
      *     tags: [Books]
@@ -332,18 +327,9 @@
      *               properties:
      *                 message:
      *                   type: string
+     *                   example: Book purchased successfully
      *                 owned:
-     *                   type: object
-     *                   properties:
-     *                     _id:
-     *                       type: string
-     *                     user:
-     *                       type: string
-     *                     book:
-     *                       type: string
-     *                     createdAt:
-     *                       type: string
-     *                       format: date-time
+     *                   $ref: '#/components/schemas/OwnedBook'
      *       400:
      *         description: Bad request (insufficient funds, already owned, or already borrowed)
      *       401:
@@ -482,4 +468,119 @@
  *         description: Forbidden (User doesn't own book or borrow period has expired)
  *       404:
  *         description: Book, PDF not found, or file not found on server
+ */
+
+/**
+ * @swagger
+ * /books/borrowed:
+ *   get:
+ *     summary: Get borrowed books statistics (Admin only)
+ *     description: Retrieve statistics about borrowed books with optional date filtering. Admin access required.
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: from
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Start date for filtering (YYYY-MM-DD)
+ *       - in: query
+ *         name: to
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: End date for filtering (YYYY-MM-DD)
+ *       - in: query
+ *         name: days
+ *         schema:
+ *           type: integer
+ *         description: Number of past days to include (alternative to from/to)
+ *     responses:
+ *       200:
+ *         description: Borrowed books statistics
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                   description: Total number of borrowed books
+ *                 books:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       title:
+ *                         type: string
+ *                         description: Book title
+ *                       returnDate:
+ *                         type: string
+ *                         format: date-time
+ *                         description: Expected return date
+ *       401:
+ *         description: Unauthorized (No token provided)
+ *       403:
+ *         description: Forbidden (Admin access required)
+ *       500:
+ *         description: Server error
+ */
+
+/**
+ * @swagger
+ * /books/sold:
+ *   get:
+ *     summary: Get sold books statistics (Admin only)
+ *     description: Retrieve statistics about sold books with optional date filtering. Admin access required.
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: from
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Start date for filtering (YYYY-MM-DD)
+ *       - in: query
+ *         name: to
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: End date for filtering (YYYY-MM-DD)
+ *       - in: query
+ *         name: days
+ *         schema:
+ *           type: integer
+ *         description: Number of past days to include (alternative to from/to)
+ *     responses:
+ *       200:
+ *         description: Sold books statistics
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                   description: Total number of sold books
+ *                 books:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         description: Book ID
+ *                       title:
+ *                         type: string
+ *                         description: Book title
+ *       401:
+ *         description: Unauthorized (No token provided)
+ *       403:
+ *         description: Forbidden (Admin access required)
+ *       500:
+ *         description: Server error
  */

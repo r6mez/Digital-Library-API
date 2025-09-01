@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getSubscriptions, createSubscription, updateSubscription, deleteSubscription, activateSubscription, deactivateSubscription,getSubscriptionStatistics } = require('../controllers/subscriptionController');
+const { getSubscriptions, createSubscription, updateSubscription, deleteSubscription, activateSubscription, deactivateSubscription } = require('../controllers/subscriptionController');
 const { protect } = require('../middleware/authMiddleware');
 const { createSubscriptionSchema } = require('../validators/subscriptionValidator');
 const validate = require('../validators/validate');
@@ -13,6 +13,5 @@ router.post('/', protect, admin, validate(createSubscriptionSchema), createSubsc
 router.put('/:id', protect, admin, validate(createSubscriptionSchema), updateSubscription);
 router.delete('/:id', protect, admin, deleteSubscription);
 router.delete('/:id/deactivate', protect, admin, deactivateSubscription);
-router.get('/stats', protect, admin, getSubscriptionStatistics);
 
 module.exports = router;
