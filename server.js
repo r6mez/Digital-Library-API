@@ -12,12 +12,16 @@ const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const statisticsRoutes = require('./routes/statisticsRoutes');
 const { setupSwaggerUI, getSwaggerSpec } = require('./controllers/swaggerController');
+const { generalLimiter, authLimiter, adminLimiter } = require('./middleware/rateLimiterMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+
+// Apply general rate limiting to all routes
+app.use(generalLimiter);
 
 // Root route
 app.get('/', (req, res) => { res.send('API is running...'); });
@@ -29,7 +33,7 @@ setupSwaggerUI(app);
 app.get('/api-docs.json', getSwaggerSpec);
 
 // API Routes
-app.use('/auth', authRoutes);
+app.use('/auth', authLimiter, authRoutes);
 app.use('/users', userRoutes);
 app.use('/books', bookRoutes);
 app.use('/types', typeRoutes);
@@ -38,7 +42,7 @@ app.use('/authors', authorRoutes);
 app.use('/offers', offerRoutes);
 app.use('/subscriptions', subscriptionRoutes);
 app.use('/transactions', transactionRoutes);
-app.use('/statistics', statisticsRoutes ); 
+app.use('/statistics', adminLimiter, statisticsRoutes); 
 
 // Connect to database and start the server only after a successful connection
 connectDB()

@@ -49,13 +49,6 @@ const setupSwaggerUI = (app) => {
             <div class="loading">Loading API Documentation...</div>
           </div>
           
-          <!-- Debug info -->
-          <div class="debug">
-            <h3>Debug Info:</h3>
-            <p>Spec paths count: ${Object.keys(swaggerSpec.paths || {}).length}</p>
-            <p>Available paths: ${JSON.stringify(Object.keys(swaggerSpec.paths || {}), null, 2)}</p>
-          </div>
-          
           <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-bundle.js" charset="UTF-8"></script>
           <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-standalone-preset.js" charset="UTF-8"></script>
           <script>

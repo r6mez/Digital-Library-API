@@ -7,7 +7,7 @@ A comprehensive, feature-rich backend API for a modern digital library system bu
 - **Library**: Manage books (authors, categories, types), search with pagination, PDF upload and controlled access.
 - **Users & auth**: JWT login, email verification/reset, profiles, and admin role-based access.
 - **Monetization**: Buy, borrow per-day, subscriptions with quotas, time‑limited offers, wallet and transactions.
-- **Engineering**: MongoDB transactions, Joi validation, centralized errors, Swagger docs, and secure file uploads.
+- **Engineering**: MongoDB transactions, Joi validation, rate limiting protection, Swagger docs, and secure file uploads.
 
 ## 🛠️ Tech Stack
 
@@ -20,6 +20,7 @@ A comprehensive, feature-rich backend API for a modern digital library system bu
 - **JWT (jsonwebtoken)** - Stateless authentication tokens
 - **bcryptjs** - Password hashing and salting
 - **Crypto** - Token generation for email verification and password reset
+- **express-rate-limit** - Rate limiting middleware for API protection
 
 ### **External Libraries**
 - **Joi** - Object schema validation
