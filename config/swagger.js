@@ -43,4 +43,15 @@ const options = {
 
 const swaggerSpec = swaggerJsdoc(options);
 
-module.exports = { swaggerUi, swaggerSpec };
+// Custom Swagger UI options for better Vercel compatibility
+const swaggerUiOptions = {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Digital Library API Documentation',
+  swaggerOptions: {
+    persistAuthorization: true,
+    displayRequestDuration: true,
+    tryItOutEnabled: true
+  }
+};
+
+module.exports = { swaggerUi, swaggerSpec, swaggerUiOptions };

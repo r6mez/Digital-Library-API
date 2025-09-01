@@ -11,7 +11,7 @@ const offerRoutes = require('./routes/offerRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const statisticsRoutes = require('./routes/statisticsRoutes');
-const { swaggerUi, swaggerSpec } = require("./config/swagger");
+const { setupSwaggerUI, getSwaggerSpec } = require('./controllers/swaggerController');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -22,7 +22,11 @@ app.use(express.json());
 // Root route
 app.get('/', (req, res) => { res.send('API is running...'); });
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Setup Swagger UI with custom middleware and options
+setupSwaggerUI(app);
+
+// Swagger JSON specification endpoint
+app.get('/api-docs.json', getSwaggerSpec);
 
 // API Routes
 app.use('/auth', authRoutes);
