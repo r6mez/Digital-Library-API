@@ -2,14 +2,14 @@
  * @swagger
  * tags:
  *   - name: Statistics
- *     description: Endpoints for revenue, books, and library statistics
+ *     description: Endpoints for revenue, books, and library statistics (Admin Only)
  */
 
 /**
  * @swagger
  * /statistics/revenue/total:
  *   get:
- *     summary: Get total revenue in a given interval
+ *     summary: Get total revenue in a given interval (Admin Only)
  *     tags: [Statistics]
  *     parameters:
  *       - in: query
@@ -47,7 +47,7 @@
  * @swagger
  * /statistics/revenue/type:
  *   get:
- *     summary: Get revenue grouped by transaction type
+ *     summary: Get revenue grouped by transaction type (Admin Only)
  *     tags: [Statistics]
  *     parameters:
  *       - in: query
@@ -134,7 +134,7 @@
  * @swagger
  * /statistics/library:
  *   get:
- *     summary: Get best book, best author, and general library stats
+ *     summary: Get best book, best author, and general library stats (Admin Only)
  *     tags: [Statistics]
  *     responses:
  *       200:

@@ -28,6 +28,10 @@ A comprehensive, feature-rich backend API for a modern digital library system bu
 - **Nodemailer** - Email service integration
 - **express-rate-limit** - limit the rate of requests
 
+## ERD
+
+![ERD](assets/ERD.png)
+
 ## 📚 API Documentation
 
 - **Swagger UI:** You can view and all the endpoints from here https://digital-library-api.vercel.app/api-docs
