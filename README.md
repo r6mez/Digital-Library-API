@@ -5,7 +5,7 @@ A comprehensive, feature-rich backend API for a modern digital library system bu
 ## 🌟 Key Features
 
 - **Library**: Manage books (authors, categories, types), search with pagination, PDF upload and controlled access.
-- **Users & auth**: JWT login, email verification/reset, profiles, and admin role-based access.
+- **Users & auth**: JWT login, email verification/reset, password forget/reset, profiles, pre-save hook for password hashing, and admin role-based access.
 - **Monetization**: Buy, borrow per-day, subscriptions with quotas, time‑limited offers, wallet and transactions.
 - **Engineering**: MongoDB transactions, Joi validation, rate limiting protection, Swagger docs, and secure file uploads.
 

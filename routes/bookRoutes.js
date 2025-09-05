@@ -5,19 +5,19 @@ const { getSoldBooks, getBorrowedBooks, getBooks, getBookById, createBook, updat
 const { protect } = require('../middleware/authMiddleware');
 const { admin } = require('../middleware/adminMiddleware');
 const upload = require('../middleware/upload');
-const { bookSchema, borrowBookSchema } = require('../validators/bookValidator');
+const { bookSchema, createBookSchema, updateBookSchema, borrowBookSchema } = require('../validators/bookValidator');
 
 router.get('/', getBooks);
 router.get('/borrowed', protect, admin, getBorrowedBooks);
 router.get('/sold', protect, admin, getSoldBooks);
 router.get('/:id', getBookById);
 
-router.post('/:id/sold', protect, buyBook);
-router.post('/:id/borrowed', protect, validate(borrowBookSchema), borrowBook);
+router.post('/:id/buy', protect, buyBook);
+router.post('/:id/borrow', protect, validate(borrowBookSchema), borrowBook);
 router.post('/:id/return', protect, returnBook);
 
-router.post('/', protect, admin, validate(bookSchema), createBook);
-router.put('/:id', protect, admin, validate(bookSchema), updateBook);
+router.post('/', protect, admin, validate(createBookSchema), createBook);
+router.put('/:id', protect, admin, validate(updateBookSchema), updateBook);
 router.delete('/:id', protect, admin, deleteBook);
 
 router.post('/:id/pdf', protect, admin, upload.single('pdf'), uploadBookPDF);

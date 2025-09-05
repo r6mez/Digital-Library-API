@@ -1,4 +1,4 @@
-const Joi = require('joi');
+const Joi = require("joi");
 
 const registerSchema = Joi.object({
   name: Joi.string().min(3).required(),
@@ -27,18 +27,18 @@ const verifyEmailSchema = Joi.object({
 const updateProfileSchema = Joi.object({
   name: Joi.string().min(3).optional(),
   password: Joi.string().min(6).optional(),
-  currentPassword: Joi.string().when('password', {
+  currentPassword: Joi.string().when("password", {
     is: Joi.exist(),
     then: Joi.required(),
-    otherwise: Joi.optional()
-  })
+    otherwise: Joi.optional(),
+  }),
 }).min(1); // At least one field must be provided
 
-module.exports = { 
-  registerSchema, 
-  loginSchema, 
-  forgotPasswordSchema, 
-  resetPasswordSchema, 
-  verifyEmailSchema, 
-  updateProfileSchema 
+module.exports = {
+  registerSchema,
+  loginSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  verifyEmailSchema,
+  updateProfileSchema,
 };

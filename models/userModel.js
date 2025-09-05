@@ -1,54 +1,58 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    money: {
+      type: Number,
+      default: 0,
+    },
+    admin: {
+      type: Boolean,
+      default: false,
+    },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    emailVerificationToken: {
+      type: String,
+    },
+    emailVerificationTokenExpires: {
+      type: Date,
+    },
+    passwordResetToken: {
+      type: String,
+    },
+    passwordResetTokenExpires: {
+      type: Date,
+    },
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true, // Ensures no two users can have the same email
-    lowercase: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  money: {
-    type: Number,
-    default: 0,
-  },
-  admin: {
-    type: Boolean,
-    default: false,
-  },
-  isEmailVerified: {
-    type: Boolean,
-    default: false,
-  },
-  emailVerificationToken: {
-    type: String,
-  },
-  emailVerificationTokenExpires: {
-    type: Date,
-  },
-  passwordResetToken: {
-    type: String,
-  },
-  passwordResetTokenExpires: {
-    type: Date,
+  {
+    timestamps: true,
   }
-}, {
-  timestamps: true, 
-});
-
+);
 
 // Hashing password before saving
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
+userSchema.pre("save", async function (next) {
+  // If the password field wasn’t changed (updating email only)
+  // we skip hashing and just continue saving.
+  if (!this.isModified("password")) {
     return next();
   }
 
@@ -64,20 +68,24 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 
 // Generate email verification token
 userSchema.methods.generateEmailVerificationToken = function () {
-  const token = crypto.randomBytes(32).toString('hex');
-  this.emailVerificationToken = crypto.createHash('sha256').update(token).digest('hex');
+  const token = crypto.randomBytes(32).toString("hex");
+  this.emailVerificationToken = crypto
+    .createHash("sha256")
+    .update(token)
+    .digest("hex");
   this.emailVerificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
   return token;
 };
 
 // Generate password reset token
 userSchema.methods.generatePasswordResetToken = function () {
-  const token = crypto.randomBytes(32).toString('hex');
-  this.passwordResetToken = crypto.createHash('sha256').update(token).digest('hex');
+  const token = crypto.randomBytes(32).toString("hex");
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(token)
+    .digest("hex");
   this.passwordResetTokenExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
   return token;
 };
 
-const User = mongoose.model('User', userSchema);
-
-module.exports = User;
+module.exports = mongoose.model("User", userSchema);

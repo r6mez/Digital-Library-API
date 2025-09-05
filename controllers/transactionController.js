@@ -1,5 +1,11 @@
 const Transaction = require('../models/transactionModel');
 const asyncHandler = require('../utils/asyncHandler');
+const {
+  SUCCESS,
+  CREATED,
+  NO_CONTENT,
+  NOT_FOUND
+} = require('../constants/httpStatusCodes');
 
 // Get all transactions
 const getAllTransactions = asyncHandler(async (req, res) => {
@@ -21,7 +27,7 @@ const getAllTransactions = asyncHandler(async (req, res) => {
     
     const total = await Transaction.countDocuments(filter);
     
-    res.status(200).json({
+    res.status(SUCCESS).json({
         success: true,
         data: {
             transactions,
@@ -48,7 +54,7 @@ const createTransaction = asyncHandler(async (req, res) => {
         createdAt: Date.now()
     });
 
-    res.status(201).json({
+    res.status(CREATED).json({
         success: true,
         data: transaction
     });
@@ -59,13 +65,13 @@ const getTransactionById = asyncHandler(async (req, res) => {
     const transaction = await Transaction.findById(req.params.id).populate('user');
 
     if (!transaction) {
-        return res.status(404).json({
+        return res.status(NOT_FOUND).json({
             success: false,
             message: 'Transaction not found'
         });
     }
 
-    res.status(200).json({
+    res.status(SUCCESS).json({
         success: true,
         data: transaction
     });
@@ -79,13 +85,13 @@ const updateTransaction = asyncHandler(async (req, res) => {
     });
 
     if (!transaction) {
-        return res.status(404).json({
+        return res.status(NOT_FOUND).json({
             success: false,
             message: 'Transaction not found'
         });
     }
 
-    res.status(200).json({
+    res.status(SUCCESS).json({
         success: true,
         data: transaction
     });
@@ -96,13 +102,13 @@ const deleteTransaction = asyncHandler(async (req, res) => {
     const transaction = await Transaction.findByIdAndDelete(req.params.id);
 
     if (!transaction) {
-        return res.status(404).json({
+        return res.status(NOT_FOUND).json({
             success: false,
             message: 'Transaction not found'
         });
     }
 
-    res.status(204).json({
+    res.status(NO_CONTENT).json({
         success: true,
         message: 'Transaction deleted successfully'
     });

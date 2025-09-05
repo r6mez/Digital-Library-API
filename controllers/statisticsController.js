@@ -6,6 +6,9 @@ const OwendBook = require('../models/owendBookModel');
 const asyncHandler = require('../utils/asyncHandler');
 const activeSubscriptionsModel = require('../models/activeSubscribtionModel');
 const { dateFilter } = require('../utils/dataUtils');
+const {
+  SUCCESS
+} = require('../constants/httpStatusCodes');
 
 const getTotalRevenue = asyncHandler(async (req, res) => {
     const { from, to, days } = req.query;
@@ -93,7 +96,7 @@ const getSubscriptionStatistics = asyncHandler(async (req, res) => {
         expired: expiredCount
     };
 
-    res.status(200).json({
+    res.status(SUCCESS).json({
         success: true,
         data: stats
     });

@@ -1,4 +1,5 @@
-const { swaggerUi, swaggerSpec, swaggerUiOptions } = require("../config/swagger");
+const { swaggerSpec } = require("../config/swagger");
+const { INTERNAL_SERVER_ERROR } = require("../constants/httpStatusCodes");
 
 /**
  * Middleware to fix MIME types for Swagger UI assets
@@ -6,15 +7,15 @@ const { swaggerUi, swaggerSpec, swaggerUiOptions } = require("../config/swagger"
  */
 const fixSwaggerMimeTypes = (req, res, next) => {
   // Set MIME types based on URL patterns - simplified for Vercel compatibility
-  const url = req.url || '';
-  const path = req.path || '';
-  
-  if (url.includes('.css') || path.includes('.css')) {
-    res.setHeader('Content-Type', 'text/css');
-  } else if (url.includes('.js') || path.includes('.js')) {
-    res.setHeader('Content-Type', 'application/javascript');
+  const url = req.url || "";
+  const path = req.path || "";
+
+  if (url.includes(".css") || path.includes(".css")) {
+    res.setHeader("Content-Type", "text/css");
+  } else if (url.includes(".js") || path.includes(".js")) {
+    res.setHeader("Content-Type", "application/javascript");
   }
-  
+
   next();
 };
 
@@ -24,12 +25,12 @@ const fixSwaggerMimeTypes = (req, res, next) => {
  */
 const setupSwaggerUI = (app) => {
   // Serve custom HTML for Swagger UI with embedded spec
-  app.get('/api-docs', (req, res) => {
+  app.get("/api-docs", (req, res) => {
     try {
       // Debug the swagger spec
-      console.log('Swagger spec paths:', Object.keys(swaggerSpec.paths || {}));
-      console.log('Swagger spec info:', swaggerSpec.info);
-      
+      console.log("Swagger spec paths:", Object.keys(swaggerSpec.paths || {}));
+      console.log("Swagger spec info:", swaggerSpec.info);
+
       const customHtml = `
         <!DOCTYPE html>
         <html>
@@ -95,11 +96,11 @@ const setupSwaggerUI = (app) => {
         </html>
       `;
 
-      res.setHeader('Content-Type', 'text/html');
+      res.setHeader("Content-Type", "text/html");
       res.send(customHtml);
     } catch (error) {
-      console.error('Error serving Swagger UI:', error);
-      res.status(500).send('Error loading API documentation');
+      console.error("Error serving Swagger UI:", error);
+      res.status(INTERNAL_SERVER_ERROR).send("Error loading API documentation");
     }
   });
 };
@@ -111,16 +112,18 @@ const setupSwaggerUI = (app) => {
  */
 const getSwaggerSpec = (req, res) => {
   try {
-    res.setHeader('Content-Type', 'application/json');
+    res.setHeader("Content-Type", "application/json");
     res.json(swaggerSpec);
   } catch (error) {
-    console.error('Error serving Swagger spec:', error);
-    res.status(500).json({ error: 'Failed to load API specification' });
+    console.error("Error serving Swagger spec:", error);
+    res
+      .status(INTERNAL_SERVER_ERROR)
+      .json({ error: "Failed to load API specification" });
   }
 };
 
 module.exports = {
   setupSwaggerUI,
   fixSwaggerMimeTypes,
-  getSwaggerSpec
+  getSwaggerSpec,
 };
