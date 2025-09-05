@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 
 // Create reusable transporter object using SMTP transport
 const createTransporter = () => {
@@ -14,13 +14,13 @@ const createTransporter = () => {
 
 const sendVerificationEmail = async (email, name, verificationToken) => {
   const transporter = createTransporter();
-  
+
   const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
-  
+
   const mailOptions = {
     from: `"Digital Library" <${process.env.EMAIL_FROM}>`,
     to: email,
-    subject: 'Email Verification - Digital Library',
+    subject: "Email Verification - Digital Library",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #333;">Welcome to Digital Library!</h2>
@@ -48,13 +48,13 @@ const sendVerificationEmail = async (email, name, verificationToken) => {
 // Send password reset email
 const sendPasswordResetEmail = async (email, name, resetToken) => {
   const transporter = createTransporter();
-  
+
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
-  
+
   const mailOptions = {
     from: `"Digital Library" <${process.env.EMAIL_FROM}>`,
     to: email,
-    subject: 'Password Reset - Digital Library',
+    subject: "Password Reset - Digital Library",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #333;">Password Reset Request</h2>
@@ -80,13 +80,20 @@ const sendPasswordResetEmail = async (email, name, resetToken) => {
 };
 
 // Send book borrow confirmation email
-const sendBookBorrowEmail = async (email, name, bookName, days, amount, returnDate) => {
+const sendBookBorrowEmail = async (
+  email,
+  name,
+  bookName,
+  days,
+  amount,
+  returnDate
+) => {
   const transporter = createTransporter();
-  
+
   const mailOptions = {
     from: `"Digital Library" <${process.env.EMAIL_FROM}>`,
     to: email,
-    subject: 'Book Borrowed Successfully - Digital Library',
+    subject: "Book Borrowed Successfully - Digital Library",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #333;">Book Borrowed Successfully!</h2>
@@ -98,7 +105,9 @@ const sendBookBorrowEmail = async (email, name, bookName, days, amount, returnDa
           <p><strong>Name:</strong> ${bookName}</p>
           <p><strong>Borrow Duration:</strong> ${days} day(s)</p>
           <p><strong>Amount Paid:</strong> $${amount}</p>
-          <p><strong>Return Date:</strong> ${new Date(returnDate).toLocaleDateString()}</p>
+          <p><strong>Return Date:</strong> ${new Date(
+            returnDate
+          ).toLocaleDateString()}</p>
         </div>
         
         <p>Please make sure to return the book by the due date to avoid any late fees.</p>
@@ -116,11 +125,11 @@ const sendBookBorrowEmail = async (email, name, bookName, days, amount, returnDa
 // Send book purchase confirmation email
 const sendBookPurchaseEmail = async (email, name, bookName, amount) => {
   const transporter = createTransporter();
-  
+
   const mailOptions = {
     from: `"Digital Library" <${process.env.EMAIL_FROM}>`,
     to: email,
-    subject: 'Book Purchased Successfully - Digital Library',
+    subject: "Book Purchased Successfully - Digital Library",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #333;">Book Purchased Successfully!</h2>
@@ -147,15 +156,21 @@ const sendBookPurchaseEmail = async (email, name, bookName, amount) => {
 };
 
 // Send offer purchase confirmation email
-const sendOfferPurchaseEmail = async (email, name, offerDetails, bookNames, amount) => {
+const sendOfferPurchaseEmail = async (
+  email,
+  name,
+  offerDetails,
+  bookNames,
+  amount
+) => {
   const transporter = createTransporter();
-  
-  const bookList = bookNames.map(name => `<li>${name}</li>`).join('');
-  
+
+  const bookList = bookNames.map((name) => `<li>${name}</li>`).join("");
+
   const mailOptions = {
     from: `"Digital Library" <${process.env.EMAIL_FROM}>`,
     to: email,
-    subject: 'Offer Purchased Successfully - Digital Library',
+    subject: "Offer Purchased Successfully - Digital Library",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #333;">Offer Purchased Successfully!</h2>
@@ -186,13 +201,21 @@ const sendOfferPurchaseEmail = async (email, name, offerDetails, bookNames, amou
 };
 
 // Send subscription activation confirmation email
-const sendSubscriptionActivationEmail = async (email, name, subscriptionName, amount, duration, maxBorrows, expiryDate) => {
+const sendSubscriptionActivationEmail = async (
+  email,
+  name,
+  subscriptionName,
+  amount,
+  duration,
+  maxBorrows,
+  expiryDate
+) => {
   const transporter = createTransporter();
-  
+
   const mailOptions = {
     from: `"Digital Library" <${process.env.EMAIL_FROM}>`,
     to: email,
-    subject: 'Subscription Activated Successfully - Digital Library',
+    subject: "Subscription Activated Successfully - Digital Library",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #333;">Subscription Activated Successfully!</h2>
@@ -205,7 +228,9 @@ const sendSubscriptionActivationEmail = async (email, name, subscriptionName, am
           <p><strong>Amount Paid:</strong> $${amount}</p>
           <p><strong>Duration:</strong> ${duration} days</p>
           <p><strong>Maximum Borrows:</strong> ${maxBorrows} books</p>
-          <p><strong>Expires On:</strong> ${new Date(expiryDate).toLocaleDateString()}</p>
+          <p><strong>Expires On:</strong> ${new Date(
+            expiryDate
+          ).toLocaleDateString()}</p>
         </div>
         
         <p>You can now enjoy borrowing books within your subscription limits.</p>

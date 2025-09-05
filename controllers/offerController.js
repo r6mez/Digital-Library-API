@@ -5,6 +5,12 @@ const OwendBook = require("../models/owendBookModel");
 const Transaction = require("../models/transactionModel");
 const { sendOfferPurchaseEmail } = require("../utils/emailService");
 const asyncHandler = require("../utils/asyncHandler");
+const {
+  SUCCESS,
+  BAD_REQUEST,
+  NOT_FOUND,
+  GONE
+} = require("../constants/httpStatusCodes");
 
 const createOffer = asyncHandler(async (req, res) => {
     const user = req.user;
@@ -23,7 +29,7 @@ const createOffer = asyncHandler(async (req, res) => {
     let new_price = total_price * 0.75;
 
     if(user.money < new_price){
-        res.status(400).json({ 
+        res.status(BAD_REQUEST).json({ 
             message: "User doesn't have enough money!",
             joke: "جيت اشتري كتاب امي قالتلي بس يبني لا يعايرونا بفقرنا، قولتلها ياما لا الفقر مش عيب"
         })
@@ -44,22 +50,22 @@ const createOffer = asyncHandler(async (req, res) => {
 
     const offeredBooks = await OfferedBook.insertMany(offeredBooksObj);
     
-    res.status(200).json({ offer, offeredBooks });
+    res.status(SUCCESS).json({ offer, offeredBooks });
 });
 
 const getOfferById = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const offer = await Offer.findById(id).lean();
-    if (!offer) return res.status(404).json({ message: 'Offer not found' });
+    if (!offer) return res.status(NOT_FOUND).json({ message: 'Offer not found' });
     if (offer.expiresAt && new Date() > new Date(offer.expiresAt)) {
-        return res.status(410).json({ message: 'Offer has expired' });
+        return res.status(GONE).json({ message: 'Offer has expired' });
     }
 
     const offeredBooks = await OfferedBook.find({ offer: id }).populate('book');
 
     const books = offeredBooks.map(ob => ob.book);
 
-    res.status(200).json({
+    res.status(SUCCESS).json({
         offer: {
             _id: offer._id,
             original_price: offer.original_price,
@@ -76,9 +82,9 @@ const acceptOffer = asyncHandler(async (req, res) => {
     const offerId = req.params.id;
 
     const offer = await Offer.findById(offerId);
-    if (!offer) return res.status(404).json({ message: 'Offer not found' });
+    if (!offer) return res.status(NOT_FOUND).json({ message: 'Offer not found' });
     if (offer.expiresAt && new Date() > new Date(offer.expiresAt)) {
-        return res.status(410).json({ message: 'Offer has expired' });
+        return res.status(GONE).json({ message: 'Offer has expired' });
     }
 
     const offeredBooks = await OfferedBook.find({ offer: offerId }).populate('book');
@@ -90,12 +96,12 @@ const acceptOffer = asyncHandler(async (req, res) => {
         if (owned) alreadyOwned.push(ob.book._id);
     }
     if (alreadyOwned.length > 0) {
-        return res.status(400).json({ message: 'You already own one or more books in this offer', ownedBookIds: alreadyOwned });
+        return res.status(BAD_REQUEST).json({ message: 'You already own one or more books in this offer', ownedBookIds: alreadyOwned });
     }
 
     // Check balance
     const price = offer.discounted_price;
-    if (user.money < price) return res.status(400).json({ message: 'Insufficient funds' });
+    if (user.money < price) return res.status(BAD_REQUEST).json({ message: 'Insufficient funds' });
 
     // Deduct money
     user.money = user.money - price;
@@ -130,7 +136,7 @@ const acceptOffer = asyncHandler(async (req, res) => {
         // Don't fail the transaction if email fails
     }
 
-    res.status(200).json({ message: 'Offer purchased successfully', owned, transaction });
+    res.status(SUCCESS).json({ message: 'Offer purchased successfully', owned, transaction });
 });
 
 const updateOffer = asyncHandler(async (req, res) => {
@@ -138,9 +144,9 @@ const updateOffer = asyncHandler(async (req, res) => {
     const { discounted_price, original_price, books } = req.body;
 
     const offer = await Offer.findById(offerId);
-    if (!offer) return res.status(404).json({ message: 'Offer not found' });
+    if (!offer) return res.status(NOT_FOUND).json({ message: 'Offer not found' });
     if (offer.expiresAt && new Date() > new Date(offer.expiresAt)) {
-        return res.status(410).json({ message: 'Offer has expired' });
+        return res.status(GONE).json({ message: 'Offer has expired' });
     }
 
     if (discounted_price !== undefined) offer.discounted_price = discounted_price;
@@ -171,19 +177,19 @@ const updateOffer = asyncHandler(async (req, res) => {
 
     await offer.save();
 
-    res.status(200).json({ message: 'Offer updated', offer });
+    res.status(SUCCESS).json({ message: 'Offer updated', offer });
 });
 
 const deleteOffer = asyncHandler(async (req, res) => {
     const offerId = req.params.id;
     const offer = await Offer.findById(offerId);
-    if (!offer) return res.status(404).json({ message: 'Offer not found' });
+    if (!offer) return res.status(NOT_FOUND).json({ message: 'Offer not found' });
 
     // Remove referenced offered book records, then the offer
     await OfferedBook.deleteMany({ offer: offer._id });
     await Offer.deleteOne({ _id: offer._id });
 
-    res.status(200).json({ message: 'Offer deleted' });
+    res.status(SUCCESS).json({ message: 'Offer deleted' });
 });
 
 module.exports = { createOffer, getOfferById, acceptOffer, updateOffer, deleteOffer };

@@ -8,41 +8,47 @@ const BorrowedBook = require('../models/borrowedBookModel');
 const Offer = require('../models/offerModel');
 const OfferedBook = require('../models/offeredBook');
 const Transaction = require('../models/transactionModel');
+const {
+  SUCCESS,
+  BAD_REQUEST,
+  NOT_FOUND,
+  INTERNAL_SERVER_ERROR
+} = require('../constants/httpStatusCodes');
 
 const getSignedUser = asyncHandler(async (req, res) => {
-  res.status(200).json(req.user);
+  res.status(SUCCESS).json(req.user);
 });
 
 // Returns the latest active subscription for the signed-in user (or null)
 const getUserSubscription = asyncHandler(async (req, res) => {
   const active = await ActiveSubscription.findLatestActive(req.user._id);
-  if (!active) return res.status(404).json({ message: 'No active subscription found' });
-  res.status(200).json(active);
+  if (!active) return res.status(NOT_FOUND).json({ message: 'No active subscription found' });
+  res.status(SUCCESS).json(active);
 });
 
 // Returns all subscription history for the signed-in user
 const getUserSubscriptionHistory = asyncHandler(async (req, res) => {
   const history = await ActiveSubscription.findUserHistory(req.user._id);
-  if (!history || history.length === 0) return res.status(404).json({ message: 'No subscription history found' });
-  res.status(200).json(history);
+  if (!history || history.length === 0) return res.status(NOT_FOUND).json({ message: 'No subscription history found' });
+  res.status(SUCCESS).json(history);
 });
 
 // Returns transaction history for the signed-in user (most recent first)
 const getUserTransactions = asyncHandler(async (req, res) => {
   const transactions = await Transaction.find({ user: req.user._id }).sort({ createdAt: -1 });
   if (transactions.length === 0) {
-    return res.status(404).json({ message: 'No transactions found' });
+    return res.status(NOT_FOUND).json({ message: 'No transactions found' });
   }
-  res.status(200).json(transactions);
+  res.status(SUCCESS).json(transactions);
 });
 
 // Returns all the ow owned books for the signed-in user (most recent first)
 const getOwnedBooks = asyncHandler(async (req, res) => {
   const books = await OwnedBooks.find({ user: req.user._id }).sort({ createdAt: -1 }).populate("book");
   if (books.length === 0) {
-    return res.status(404).json({ message: 'No owned books found' });
+    return res.status(NOT_FOUND).json({ message: 'No owned books found' });
   }
-  res.status(200).json(books);
+  res.status(SUCCESS).json(books);
 });
 
 // Returns all currently borrowed books for the signed-in user (most recent first)
@@ -52,7 +58,7 @@ const getBorrowedBooks = asyncHandler(async (req, res) => {
     .populate("book", "name author cover_image_url publication_date category type");
   
   if (borrowedBooks.length === 0) {
-    return res.status(404).json({ message: 'No borrowed books found' });
+    return res.status(NOT_FOUND).json({ message: 'No borrowed books found' });
   }
 
   // Add status to each borrowed book (active or expired)
@@ -65,7 +71,7 @@ const getBorrowedBooks = asyncHandler(async (req, res) => {
     };
   });
 
-  res.status(200).json(borrowedBooksWithStatus);
+  res.status(SUCCESS).json(borrowedBooksWithStatus);
 });
 
 // Returns all offers created/assigned to the signed-in user (with included books)
@@ -77,10 +83,10 @@ const getUserOffers = asyncHandler(async (req, res) => {
     return { offer, books: offeredBooks.map(ob => ob.book) };
   }));
   if (results.length === 0) {
-    return res.status(404).json({ message: 'No offers found' });
+    return res.status(NOT_FOUND).json({ message: 'No offers found' });
   }
 
-  res.status(200).json(results);
+  res.status(SUCCESS).json(results);
 });
 
 // Update user profile
@@ -88,25 +94,25 @@ const updateProfile = async (req, res) => {
   try {
     const { error, value } = updateProfileSchema.validate(req.body);
     if (error) {
-      return res.status(400).json({ message: error.details[0].message });
+      return res.status(BAD_REQUEST).json({ message: error.details[0].message });
     }
 
     const { name, password, currentPassword } = value;
     const user = await User.findById(req.user._id);
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(NOT_FOUND).json({ message: 'User not found' });
     }
 
     // If updating password, verify current password
     if (password) {
       if (!currentPassword) {
-        return res.status(400).json({ message: 'Current password is required to update password' });
+        return res.status(BAD_REQUEST).json({ message: 'Current password is required to update password' });
       }
       
       const isCurrentPasswordCorrect = await user.matchPassword(currentPassword);
       if (!isCurrentPasswordCorrect) {
-        return res.status(400).json({ message: 'Current password is incorrect' });
+        return res.status(BAD_REQUEST).json({ message: 'Current password is incorrect' });
       }
       
       user.password = password;
@@ -127,7 +133,7 @@ const updateProfile = async (req, res) => {
       isEmailVerified: user.isEmailVerified,
     });
   } catch (error) {
-    res.status(500).json({ message: `Server Error: ${error}` });
+    res.status(INTERNAL_SERVER_ERROR).json({ message: `Server Error: ${error}` });
   }
 };
 

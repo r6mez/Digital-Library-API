@@ -5,11 +5,18 @@ const User = require('../models/userModel');
 const asyncHandler = require('../utils/asyncHandler');
 const { sendSubscriptionActivationEmail } = require('../utils/emailService');
 const mongoose = require('mongoose');
+const {
+  SUCCESS,
+  CREATED,
+  NO_CONTENT,
+  BAD_REQUEST,
+  NOT_FOUND
+} = require('../constants/httpStatusCodes');
 
  
 const getSubscriptions = asyncHandler(async (req, res) => {
   const subscriptions = await Subscription.find({ user: req.user });
-  res.status(200).json({
+  res.status(SUCCESS).json({
     success: true,
     data: subscriptions
   });
@@ -23,7 +30,7 @@ const createSubscription = asyncHandler(async (req, res, next) => {
     price,
     duration_in_days
   });
-  res.status(201).json({
+  res.status(CREATED).json({
     success: true,
     data: subscription
   });
@@ -38,12 +45,12 @@ const updateSubscription = asyncHandler(async (req, res, next) => {
     duration_in_days
   }, { new: true });
   if (!subscription) {
-    res.status(404).json({
+    res.status(NOT_FOUND).json({
       success: false,
       message: 'Subscription not found'
     });
   }
-  res.status(200).json({
+  res.status(SUCCESS).json({
     success: true,
     data: subscription
   });
@@ -52,11 +59,11 @@ const updateSubscription = asyncHandler(async (req, res, next) => {
 const deleteSubscription = asyncHandler(async (req, res) => {
   const subscription = await Subscription.findByIdAndDelete(req.params.id);
   if (!subscription) {
-    res.status(404).json({
+    res.status(NOT_FOUND).json({
       message: 'Subscription not found'
     });
   }
-  res.status(200).json({
+  res.status(SUCCESS).json({
     message: "Subscription deleted successfully"
   });
 });
@@ -74,7 +81,7 @@ const activateSubscription = asyncHandler(async (req, res) => {
         const subscription = await Subscription.findById(subscription_id).session(session);
         if (!subscription) {
             await session.abortTransaction();
-            return res.status(404).json({
+            return res.status(NOT_FOUND).json({
                 success: false,
                 message: 'Subscription not found'
             });
@@ -84,7 +91,7 @@ const activateSubscription = asyncHandler(async (req, res) => {
         const existingActive = await activeSubscriptionsModel.findLatestActive(userId);
         if (existingActive) {
             await session.abortTransaction();
-            return res.status(400).json({
+            return res.status(BAD_REQUEST).json({
                 success: false,
                 message: 'You already have an active subscription',
                 data: {
@@ -98,7 +105,7 @@ const activateSubscription = asyncHandler(async (req, res) => {
         const user = await User.findById(userId).session(session);
         if (user.money < subscription.price) {
             await session.abortTransaction();
-            return res.status(400).json({
+            return res.status(BAD_REQUEST).json({
                 success: false,
                 message: 'Insufficient funds'
             });
@@ -149,7 +156,7 @@ const activateSubscription = asyncHandler(async (req, res) => {
             // Don't fail the transaction if email fails
         }
 
-        res.status(201).json({
+        res.status(CREATED).json({
             success: true,
             data: {
                 activeSubscription: activeSubscription[0],
@@ -170,12 +177,12 @@ const deactivateSubscription = asyncHandler(async (req, res, next) => {
   const subscription_id = req.params.id; // Get subscription ID from URL parameter
   const activeSubscription = await activeSubscriptionsModel.findByIdAndDelete(subscription_id);
   if (!activeSubscription) {
-    res.status(404).json({
+    res.status(NOT_FOUND).json({
       success: false,
       message: 'Active subscription not found'
     });
   }
-  res.status(204).json({
+  res.status(NO_CONTENT).json({
     success: true,
     message: 'Active subscription deleted successfully'
   });
