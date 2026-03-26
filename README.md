@@ -2,14 +2,14 @@
 
 A comprehensive, feature-rich backend API for a modern digital library system built with Node.js, Express, and MongoDB. This API powers a complete online library ecosystem with user authentication, book management, subscription-based borrowing, purchasing, special offers, and comprehensive admin controls.
 
-## 🌟 Key Features
+## Key Features
 
 - **Library**: Manage books (authors, categories, types), search with pagination, PDF upload and controlled access.
 - **Users & auth**: JWT login, email verification/reset, password forget/reset, profiles, pre-save hook for password hashing, and admin role-based access.
 - **Monetization**: Buy, borrow per-day, subscriptions with quotas, time‑limited offers, wallet and transactions.
 - **Engineering**: MongoDB transactions, Joi validation, rate limiting protection, Swagger docs, and secure file uploads.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### **Backend Framework**
 - **Node.js** - JavaScript runtime environment
@@ -32,21 +32,21 @@ A comprehensive, feature-rich backend API for a modern digital library system bu
 
 ![ERD](assets/ERD.png)
 
-## 📚 API Documentation
+## API Documentation
 
 - **Swagger UI:** You can view and all the endpoints from here https://digital-library-api.vercel.app/api-docs
 - **Postman 🧑🏻‍🚀:** You can download and import the Postman JSON file from [here](assets/Digital-Library-API.postman_collection.json)
 
 ![Endpoints](assets/endpoints.png)
 
-## 📋 Prerequisites
+## Prerequisites
 
 - **Node.js** (v18.x or later)
 - **npm** (v8.x or later)
 - **MongoDB** (local replica set or MongoDB Atlas)
 - **Email Service** (SMTP credentials for notifications)
 
-## 🚀 Installation & Setup
+## Installation & Setup
 
 ### 1. Clone the Repository
 ```bash
