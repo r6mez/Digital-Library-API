@@ -2,39 +2,28 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
 const protect = async (req, res, next) => {
-  let token;
-
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    try {
-      // Get token from header (e.g., "Bearer eyJhbGci...")
-      token = req.headers.authorization.split(" ")[1];
-
-      // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      // Get user from the token's payload (ID) and attach to request
-      // We exclude the password field
-      req.user = await User.findById(decoded.id).select("-password");
-
-      // Check if user still exists in database
-      if (!req.user) {
-        return res.status(401).json({
-          message: "Not authorized, user no longer exists",
-        });
-      }
-
-      next(); // Proceed to the next middleware/controller
-    } catch (error) {
-      console.error(error);
-      res.status(401).json({ message: "Not authorized, token failed" });
-    }
+  if (!req.headers.authorization?.startsWith("Bearer")) {
+    return res.status(401).json({ message: "Not authorized, no token" });
   }
 
-  if (!token) {
-    return res.status(401).json({ message: "Not authorized, no token" });
+  const token = req.headers.authorization.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (decoded.type !== "access") {
+      return res.status(401).json({ message: "Invalid token type" });
+    }
+
+    next();
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Token expired" });
+    }
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
